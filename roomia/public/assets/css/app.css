@@ -1,0 +1,609 @@
+/* =========================================================
+   ROOMIA – APP CSS 
+   ========================================================= */
+
+/* ========== ROOT VARIABLES ========== */
+:root {
+    /* Brand colors */
+    --rm-primary: #003b95;
+    --rm-primary-hover: #0047b3;
+    --rm-primary-focus: #0052cc;
+    --rm-primary-active: #002f73;
+    --rm-accent: #f6a100;
+
+    /* Neutral */
+    --rm-white: #ffffff;
+    --rm-gray-600: #6c757d;
+    --rm-surface: #f8f9fa;
+
+    /* Focus */
+    --rm-focus-outline: #99c2ff;
+
+    /* Effects */
+    --rm-navbar-blur: 12px;
+    --rm-shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.25);
+
+    /* Z-index */
+    --rm-z-navbar: 1050;
+    --rm-z-dropdown: 1100;
+    --rm-z-snow: 1040;
+
+    /* Sizing */
+    --rm-brand-icon-size: 32px;
+    --rm-radius-pill: 999px;
+}
+
+/* ========== BASE ========== */
+body {
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+}
+
+/* ========== BUTTONS ========== */
+.btn-primary {
+    background: var(--rm-primary);
+    color: var(--rm-white);
+}
+.btn-primary:hover {
+    background: var(--rm-primary-hover);
+    color: var(--rm-white);
+}
+.btn-primary:focus {
+    background: var(--rm-primary-focus);
+    outline: 2px solid var(--rm-focus-outline);
+    color: var(--rm-white);
+}
+.btn-primary:active {
+    background: var(--rm-primary-active);
+    color: var(--rm-white);
+}
+
+img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    object-fit: cover;
+    display: block;
+}
+
+/* ========== Footer (Roomia) ========== */
+.rm-footer {
+    background: #f3f5f7;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.rm-footer .fw-bold {
+    letter-spacing: 0.02em;
+    font-size: 0.95rem;
+}
+
+.rm-footer-links li {
+    margin: 0.35rem 0;
+}
+
+.rm-footer-links a {
+    color: rgba(0, 0, 0, 0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.rm-footer-links a:hover {
+    color: var(--rm-primary);
+    text-decoration: underline;
+}
+
+.rm-footer-divider {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.rm-footer-mini {
+    color: rgba(0, 0, 0, 0.55);
+    text-decoration: none;
+}
+
+.rm-footer-mini:hover {
+    color: var(--rm-primary);
+    text-decoration: underline;
+}
+
+/* ========== NAVBAR (GLOBAL) ========== */
+.navbar {
+    position: relative;
+    z-index: var(--rm-z-navbar);
+}
+
+.navbar .dropdown-menu {
+    z-index: var(--rm-z-dropdown);
+}
+
+/* ========== APP NAVBAR (SHARED FOR ALL ROLES) ========== */
+.app-navbar {
+    background: linear-gradient(
+        90deg,
+        var(--rm-primary),
+        var(--rm-primary-hover)
+    );
+    backdrop-filter: blur(var(--rm-navbar-blur));
+}
+
+.brand-icon {
+    width: var(--rm-brand-icon-size);
+    height: var(--rm-brand-icon-size);
+    border-radius: var(--rm-radius-pill);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+}
+
+.text-accent {
+    color: var(--rm-accent);
+}
+
+.app-navbar .navbar-nav .nav-item {
+    margin-right: 1rem;
+}
+.app-navbar .navbar-nav .nav-item:last-child {
+    margin-right: 0;
+}
+
+.app-navbar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    opacity: 0.9;
+}
+
+.app-navbar .nav-link.active {
+    font-weight: 600;
+    opacity: 1;
+    position: relative;
+}
+
+.app-navbar .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0;
+    height: 2px;
+    border-radius: 99px;
+    background: var(--rm-accent);
+}
+
+/* ========== AUTH SLIDER ========== */
+.auth-page {
+    background: linear-gradient(
+        135deg,
+        var(--rm-primary),
+        var(--rm-white),
+        var(--rm-primary)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+    position: relative;
+}
+
+.auth-slider-card {
+    max-width: 980px;
+    width: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--rm-white);
+    box-shadow: var(--rm-shadow-strong);
+}
+
+.auth-slider-strip {
+    display: flex;
+    width: 200%;
+    transition: transform 0.6s ease;
+}
+
+.auth-view {
+    width: 50%;
+    display: flex;
+    align-items: stretch;
+}
+
+.auth-slider-card.auth-mode-signup .auth-slider-strip {
+    transform: translateX(-50%);
+}
+
+.auth-side-panel {
+    padding: 3rem 2.5rem;
+    background: var(--rm-primary);
+    color: var(--rm-white);
+}
+
+.auth-form-panel {
+    background: var(--rm-white);
+}
+
+.auth-primary-btn {
+    font-weight: 600;
+}
+
+.auth-form-panel a.small {
+    color: var(--rm-gray-600);
+}
+.auth-form-panel a.small:hover {
+    color: var(--rm-primary-hover);
+}
+
+/* ========== ROOM / IMAGE ========== */
+.room-map {
+    width: 100%;
+    height: 200px;
+}
+
+.room-thumb-wrapper {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 0.25rem;
+    background: var(--rm-surface);
+}
+
+.room-thumb-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.room-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--rm-white);
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+.room-modal-img {
+    max-height: 80vh;
+    width: 100%;
+    object-fit: contain;
+}
+
+/* ====== destinations card =========== */
+.dest-card {
+    border-radius: 0.9rem;
+    overflow: hidden;
+    color: var(--rm-white);
+}
+
+.dest-card .card-img-overlay {
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.55),
+        rgba(0, 0, 0, 0.15)
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dest-card h3 {
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+    letter-spacing: 0.8px;
+    font-weight: bold;
+}
+
+/* ========== ABOUT / CONTENT PAGES (ROOMIA) ========== */
+
+/* nền trang about có “blob” chuyển động nhẹ */
+.rm-about-bg {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: radial-gradient(
+            circle at 12% 8%,
+            rgba(0, 59, 149, 0.14),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.92),
+            rgba(248, 249, 250, 1)
+        );
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.08);
+}
+
+/* 2 lớp blob màu (chạy rất nhẹ để không rối mắt) */
+.rm-about-bg::before,
+.rm-about-bg::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(42px);
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.rm-about-bg::before {
+    left: -180px;
+    top: -220px;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(0, 59, 149, 0.35),
+        transparent 60%
+    );
+    animation: rm-blob-a 18s ease-in-out infinite;
+}
+
+.rm-about-bg::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    pointer-events: none;
+    opacity: 0.25;
+    background-image: radial-gradient(
+            circle at 18% 22%,
+            rgba(255, 255, 255, 0.65),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 78% 18%,
+            rgba(255, 255, 255, 0.55),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 38% 88%,
+            rgba(255, 255, 255, 0.45),
+            transparent 36%
+        );
+    animation: rm-about-shimmer 12s ease-in-out infinite;
+}
+
+/* đảm bảo content nằm trên blob */
+.rm-about-bg > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* hero: gradient + pattern nhẹ + shadow */
+.rm-page-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: linear-gradient(
+        135deg,
+        rgba(0, 59, 149, 0.12),
+        rgba(255, 255, 255, 0.92)
+    );
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.1);
+    animation: rm-fade-up 520ms ease both;
+}
+
+.rm-page-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: radial-gradient(
+            circle at 20% 15%,
+            rgba(255, 255, 255, 0.65),
+            transparent 45%
+        ),
+        radial-gradient(
+            circle at 85% 25%,
+            rgba(255, 255, 255, 0.55),
+            transparent 40%
+        ),
+        radial-gradient(
+            circle at 40% 90%,
+            rgba(255, 255, 255, 0.45),
+            transparent 45%
+        );
+    animation: rm-shimmer 10s ease-in-out infinite;
+}
+
+/* badge mềm + hover “lift” */
+.rm-soft-badge {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 59, 149, 0.1),
+        rgba(255, 255, 255, 0.85)
+    );
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    padding: 0.38rem 0.7rem;
+    transition: transform 0.16s ease, box-shadow 0.16s ease,
+        border-color 0.16s ease;
+    animation: rm-fade-up 520ms ease both;
+}
+
+.rm-soft-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 59, 149, 0.22);
+}
+
+/* icon pill “glow” nhẹ */
+.rm-icon-pill {
+    background: rgba(0, 59, 149, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.rm-icon-pill i {
+    transition: transform 0.18s ease;
+}
+
+/* card: hover nổi + icon có chuyển động nhẹ */
+.rm-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 18px;
+    transition: transform 0.16s ease, box-shadow 0.16s ease,
+        border-color 0.16s ease;
+    animation: rm-fade-up 520ms ease both;
+}
+
+.rm-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+    border-color: rgba(0, 59, 149, 0.22);
+}
+
+.rm-card:hover .rm-icon-pill {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
+}
+
+.rm-card:hover .rm-icon-pill i {
+    transform: rotate(-8deg) scale(1.06);
+}
+
+/* ========== SNOW EFFECT (GLOBAL) ========== */
+#snow-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(--rm-z-snow);
+}
+
+.snowflake {
+    position: fixed;
+    top: -10px;
+    color: var(--rm-white);
+    pointer-events: none;
+    user-select: none;
+    z-index: var(--rm-z-snow);
+    opacity: 0.8;
+    animation: snow-fall linear infinite;
+}
+
+/* Guest picker dropdown full width trong input-group */
+.guest-dropdown.w-100 {
+    min-width: 100%;
+}
+
+.guest-stepper .btn {
+    width: 34px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guest-stepper .guest-value {
+    width: 56px;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes snow-fall {
+    0% {
+        transform: translate3d(0, -100%, 0);
+    }
+    100% {
+        transform: translate3d(0, 110vh, 0);
+    }
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* ===== animations ===== */
+@keyframes rm-blob-a {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(40px, 55px) scale(1.06);
+    }
+}
+@keyframes rm-blob-b {
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+    50% {
+        transform: translate(-55px, 40px) scale(1.08);
+    }
+}
+@keyframes rm-fade-up {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes rm-shimmer {
+    0%,
+    100% {
+        opacity: 0.28;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 0.4;
+        transform: translateY(6px);
+    }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .auth-side-panel {
+        text-align: center;
+        align-items: center;
+    }
+
+    .auth-side-panel .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .auth-form-panel {
+        padding: 2rem 1.5rem ;
+    }
+}
+
+/* mobile: blob nhỏ lại để không “nặng” */
+@media (max-width: 991.98px) {
+    .rm-about-bg::before,
+    .rm-about-bg::after {
+        width: 420px;
+        height: 420px;
+        filter: blur(36px);
+        opacity: 0.48;
+    }
+}
+
+/* accessibility: giảm chuyển động nếu user bật reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .rm-about-bg::before,
+    .rm-about-bg::after,
+    .rm-page-hero,
+    .rm-page-hero::after,
+    .rm-soft-badge,
+    .rm-card {
+        animation: none ;
+    }
+    .rm-soft-badge,
+    .rm-card,
+    .rm-icon-pill,
+    .rm-icon-pill i {
+        transition: none ;
+    }
+}
