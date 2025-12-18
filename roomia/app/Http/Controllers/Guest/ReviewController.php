@@ -9,7 +9,6 @@ use App\Models\Booking;
 use App\Models\Review;
 
 
-
 class ReviewController extends Controller
 {
     /**

@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
 use App\Models\Room;
+use App\Models\WishlistItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-
+use Illuminate\Support\Str;
 class HomeController extends Controller
 {
     public function index(Request $request)
@@ -47,36 +48,63 @@ class HomeController extends Controller
             }
         ])
             ->latest()
+            ->take(20)
+            ->get();
+
+        // Subquery: tính avg rating + count theo room (vì reviews gắn booking_id)
+        $ratingSub = DB::table('rooms')
+            ->join('room_types', 'room_types.room_id', '=', 'rooms.id')
+            ->join('bookings', 'bookings.room_type_id', '=', 'room_types.id')
+            ->join('reviews', 'reviews.booking_id', '=', 'bookings.id')
+            ->select(
+                'rooms.id as room_id',
+                DB::raw('AVG(reviews.rating) as avg_rating'),
+                DB::raw('COUNT(reviews.id) as reviews_count')
+            )
+            ->groupBy('rooms.id');
+
+        //  Collections: ưu tiên phòng rating cao (không trùng featured)
+        $collectionRooms = Room::with(['images' => fn($q) => $q->orderBy('id')])
+            ->where('rooms.status', 'active')
+            ->leftJoinSub($ratingSub, 'rr', fn($join) => $join->on('rooms.id', '=', 'rr.room_id'))
+            ->select('rooms.*')
+            ->orderByRaw('COALESCE(rr.avg_rating, 0) DESC')
+            ->orderByRaw('COALESCE(rr.reviews_count, 0) DESC')
+            ->latest('rooms.created_at')
             ->take(8)
             ->get();
 
-        // Collections (tạm dùng rooms khác)
-        $collectionRooms = Room::with([
-            'images' => function ($q) {
-                $q->orderBy('id');
-            }
-        ])
-            ->latest()
-            ->skip(8)
-            ->take(8)
+        // Explore Vietnam 
+        $exploreCitiesRaw = DB::table('cities')
+            ->join('room_addresses', 'room_addresses.city_id', '=', 'cities.id')
+            ->join('rooms', 'rooms.id', '=', 'room_addresses.room_id')
+            ->where('rooms.status', 'active')
+            ->select(
+                'cities.id',
+                'cities.name',
+                DB::raw('COUNT(DISTINCT rooms.id) as rooms_count')
+            )
+            ->groupBy('cities.id', 'cities.name')
+            ->orderByDesc('rooms_count')
+            ->limit(5)
             ->get();
 
-        // Explore Vietnam (tạm dùng rooms khác)
-        $exploreRooms = Room::with([
-            'images' => function ($q) {
-                $q->orderBy('id');
-            }
-        ])
-            ->latest()
-            ->skip(16)
-            ->take(10)
-            ->get();
+        $popularDestinations = $exploreCitiesRaw->map(function ($c) {
+            $slug = Str::slug($c->name);
+
+            return [
+                'id' => $c->id,
+                'name' => $c->name,
+                'rooms_count' => (int) $c->rooms_count,
+                'image' => "assets/images/cities/{$slug}.jpg",
+                'url' => route('rooms.index', ['city_id' => $c->id]),
+            ];
+        });
 
         // Rating map (nếu có reviews + booking_id)
         $roomRatings = collect();
         $roomIds = $featuredRooms->pluck('id')
             ->merge($collectionRooms->pluck('id'))
-            ->merge($exploreRooms->pluck('id'))
             ->unique()
             ->values();
 
@@ -139,23 +167,27 @@ class HomeController extends Controller
             ],
         ]);
 
-        $popularDestinations = collect([
-            ['name' => 'Vũng Tàu', 'image' => 'assets/images/destinations/vung-tau.jpg'],
-            ['name' => 'Đà Nẵng', 'image' => 'assets/images/destinations/da-nang.jpg'],
-            ['name' => 'Hội An', 'image' => 'assets/images/destinations/hoi-an.jpg'],
-            ['name' => 'Nha Trang', 'image' => 'assets/images/destinations/nha-trang.jpg'],
-            ['name' => 'Hà Nội', 'image' => 'assets/images/destinations/ha-noi.jpg'],
+        $exploreCities = collect([
+            ['name' => 'Vũng Tàu', 'image' => 'assets/images/destinations/vung-tau.jpg', 'url' => route('rooms.index', ['district_id' => 539])],
+            ['name' => 'Đà Nẵng', 'image' => 'assets/images/destinations/da-nang.jpg', 'url' => route('rooms.index', ['city_id' => 32])],
+            ['name' => 'Hội An', 'image' => 'assets/images/destinations/hoi-an.jpg', 'url' => route('rooms.index', ['district_id' => 364])],
+            ['name' => 'Nha Trang', 'image' => 'assets/images/destinations/nha-trang.jpg', 'url' => route('rooms.index', ['district_id' => 412])],
+            ['name' => 'Hà Nội', 'image' => 'assets/images/destinations/ha-noi.jpg', 'url' => route('rooms.index', ['city_id' => 1])],
         ]);
-
+        $wishlistRoomIds = auth()->check()
+            ? WishlistItem::where('user_id', auth()->id())->pluck('room_id')->all()
+            : [];
         return view('guest.home', compact(
             'recentSearches',
             'featuredRooms',
             'collectionRooms',
-            'exploreRooms',
+            'exploreCities',
             'roomRatings',
             'whyRoomia',
             'deals',
-            'popularDestinations'
+            'popularDestinations',
+            'wishlistRoomIds'
+
         ));
     }
     public function search(Request $request)

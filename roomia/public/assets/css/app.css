@@ -270,27 +270,110 @@ img {
 }
 
 /* ====== destinations card =========== */
+/* ===== Popular Destinations ===== */
+.dest-link {
+    color: inherit;
+    text-decoration: none;
+}
+
 .dest-card {
-    border-radius: 0.9rem;
+    border: 0;
+    border-radius: 16px;
     overflow: hidden;
-    color: var(--rm-white);
+    position: relative;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+    transform: translateY(0);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.dest-card .card-img-overlay {
+.dest-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+}
+
+.dest-img {
+    object-fit: cover;
+    transform: scale(1);
+    transition: transform 0.55s ease;
+}
+
+.dest-card:hover .dest-img {
+    transform: scale(1.08);
+}
+
+/* Overlay gradient */
+.dest-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
     background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.55),
-        rgba(0, 0, 0, 0.15)
+        180deg,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.55) 100%
     );
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    opacity: 0.95;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
 }
 
-.dest-card h3 {
-    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
-    letter-spacing: 0.8px;
-    font-weight: bold;
+.dest-card:hover::after {
+    opacity: 0.75;
+}
+
+/* Shine effect */
+.dest-card::before {
+    content: "";
+    position: absolute;
+    top: -20%;
+    left: -120%;
+    width: 70%;
+    height: 140%;
+    background: rgba(255, 255, 255, 0.18);
+    transform: skewX(-20deg);
+    transition: left 0.7s ease;
+    pointer-events: none;
+}
+
+.dest-card:hover::before {
+    left: 140%;
+}
+
+.dest-overlay {
+    pointer-events: none; /* click vẫn đi theo <a> bọc ngoài */
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 14px;
+}
+
+.dest-title {
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    font-size: 1.05rem;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.dest-sub {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dest-cta {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.92);
+    color: rgba(0, 0, 0, 0.75);
+    transform: translateX(-6px);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dest-card:hover .dest-cta {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 /* ========== ABOUT / CONTENT PAGES (ROOMIA) ========== */
@@ -462,6 +545,569 @@ img {
     transform: rotate(-8deg) scale(1.06);
 }
 
+/* =========================
+   ROOMIA SLIDER (SAFE CSS)
+   - Không ẩn item mặc định (tránh mất view)
+   - JS chạy thì đẹp hơn, JS không chạy vẫn OK
+   ========================= */
+
+/* Ảnh cover 1:1 */
+.roomia-img-cover {
+    object-fit: cover;
+}
+
+/* Wrapper slider */
+.roomia-slider {
+    position: relative;
+}
+
+/* Track cuộn ngang */
+.roomia-slider__track {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+
+    /* chừa khoảng cho nút prev/next + progress */
+    padding: 0.25rem 2.5rem 0.75rem;
+}
+
+/* Ẩn scrollbar để đỡ “kì” */
+.roomia-slider__track::-webkit-scrollbar {
+    height: 0;
+}
+.roomia-slider__track {
+    scrollbar-width: none;
+}
+
+/* Cảm giác kéo */
+.roomia-slider__track {
+    cursor: grab;
+}
+.roomia-slider__track.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+/* Item snap */
+.roomia-slider__item {
+    scroll-snap-align: start;
+}
+
+/* Card: animation/transition mượt */
+.roomia-slider__item .card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+
+    /* Mặc định (JS không chạy vẫn đẹp) */
+    transform: translateY(0) scale(1);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+    will-change: transform;
+}
+
+/* Hover: “đặc biệt” hơn */
+.roomia-slider__item .card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+}
+
+/* Active (JS sẽ gán class is-active) */
+.roomia-slider__item.is-active .card {
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+}
+
+/* Nếu JS set biến coverflow thì card sẽ “3D” nhẹ */
+.roomia-slider__item .card {
+    transform: perspective(900px) translateY(var(--roomia-y, 0px))
+        rotateY(var(--roomia-ry, 0deg)) scale(var(--roomia-s, 1));
+    filter: saturate(var(--roomia-sat, 1)) brightness(var(--roomia-bri, 1));
+}
+
+/* Nút điều hướng */
+.roomia-slider__btn {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    z-index: 5;
+
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    display: grid;
+    place-items: center;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.roomia-slider:hover .roomia-slider__btn,
+.roomia-slider:focus-within .roomia-slider__btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.roomia-slider__btn:hover {
+    transform: translateY(-50%) scale(1.06);
+    background: #fff;
+}
+
+.roomia-slider__btn--prev {
+    left: 0.35rem;
+}
+.roomia-slider__btn--next {
+    right: 0.35rem;
+}
+
+/* Progress */
+.roomia-slider__progress {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0.25rem 2.5rem 0;
+}
+
+.roomia-slider__progress > span {
+    display: block;
+    height: 100%;
+    width: var(--roomia-progress, 0%);
+    background: rgba(0, 0, 0, 0.25);
+    transition: width 0.15s ease;
+}
+
+/* Reveal animation: an toàn (không set opacity:0 mặc định) */
+.roomia-reveal {
+    opacity: 1;
+    transform: none;
+}
+
+.roomia-reveal.is-visible {
+    animation: roomiaFadeUp 0.45s ease both;
+}
+
+@keyframes roomiaFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Responsive: màn nhỏ thì bớt padding để fit */
+@media (max-width: 575.98px) {
+    .roomia-slider__track {
+        padding-left: 1.75rem;
+        padding-right: 1.75rem;
+    }
+    .roomia-slider__progress {
+        margin-left: 1.75rem;
+        margin-right: 1.75rem;
+    }
+}
+/* Why Roomia */
+.why-roomia {
+    background: var(--rm-primary);
+    border: 1px solid rgba(var(--rm-primary), 0.08);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+}
+
+.why-roomia__heading {
+    letter-spacing: 0.04em;
+    color: var(--rm-white);
+}
+
+.why-roomia__dot {
+    width: 42px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(var(--rm-accent), 0.18);
+}
+
+.why-roomia__card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.why-roomia__card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(var(--rm-accent), 0.35);
+}
+
+.why-roomia__card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.08);
+}
+
+.why-roomia__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.18);
+}
+
+.why-roomia__title {
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+}
+
+.why-roomia__desc {
+    color: var(--bs-body-color-rgb);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.why-roomia__line {
+    height: 1px;
+    width: 100%;
+    background: rgba(var(--rm-accent), 0.08);
+}
+
+/* ===== Explore Vietnam Banner ===== */
+.explore {
+    position: relative;
+    border-radius: 22px;
+    overflow: hidden;
+    min-height: 380px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.12);
+    isolation: isolate;
+}
+
+.explore__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.12);
+    filter: blur(16px) saturate(1.05) contrast(1.05);
+    opacity: 0.9;
+    transition: opacity 0.25s ease;
+}
+
+.explore__veil {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+            60% 70% at 18% 38%,
+            rgba(0, 0, 0, 0.7),
+            transparent 62%
+        ),
+        radial-gradient(
+            55% 65% at 85% 50%,
+            rgba(0, 0, 0, 0.35),
+            transparent 65%
+        ),
+        linear-gradient(120deg, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.5));
+    z-index: 1;
+}
+
+.explore__inner {
+    position: relative;
+    z-index: 2;
+    padding: 18px;
+}
+
+@media (min-width: 768px) {
+    .explore__inner {
+        padding: 26px;
+    }
+}
+@media (min-width: 992px) {
+    .explore__inner {
+        padding: 32px;
+    }
+}
+
+/* LEFT panel */
+.explore__panel {
+    border-radius: 18px;
+    padding: 16px;
+    background: rgba(10, 18, 26, 0.46);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+}
+
+.explore__kicker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.explore__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.explore__spark {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 193, 7, 0.95),
+        rgba(255, 193, 7, 0.1)
+    );
+    box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.1);
+    opacity: 0.9;
+}
+
+.explore__title {
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    font-size: 1.85rem;
+    margin: 0;
+}
+
+.explore__desc {
+    color: rgba(255, 255, 255, 0.84);
+    line-height: 1.55;
+    margin: 0;
+}
+
+.explore__btn {
+    border-radius: 999px;
+    font-weight: 800;
+}
+
+.explore__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.explore__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.explore__chip:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #fff;
+}
+
+.explore__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 193, 7, 0.95);
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.16);
+}
+
+.explore__chipName {
+    font-weight: 800;
+    white-space: nowrap;
+}
+.explore__chipCount {
+    font-size: 0.78rem;
+    opacity: 0.95;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.explore__tip {
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+/* RIGHT poster */
+.explore__poster {
+    display: block;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.18);
+    transform: translateY(0);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.explore__poster:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 85px rgba(0, 0, 0, 0.22);
+}
+
+.explore__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.03);
+    transition: transform 0.7s ease, filter 0.7s ease, opacity 0.3s ease;
+    filter: saturate(1.08) contrast(1.03);
+}
+
+.explore__poster:hover .explore__img {
+    transform: scale(1.1);
+    filter: saturate(1.15) contrast(1.05);
+}
+
+.explore__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 14px;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.15) 0%,
+        rgba(0, 0, 0, 0.72) 100%
+    );
+}
+
+.explore__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.explore__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    color: rgba(0, 0, 0, 0.78);
+    background: rgba(255, 193, 7, 0.95);
+}
+
+.explore__pill--dark {
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(8px);
+    letter-spacing: 0.02em;
+    font-weight: 800;
+}
+
+.explore__bottom {
+    display: flex;
+    align-items: end;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.explore__name {
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+    font-size: 1.35rem;
+    text-shadow: 0 18px 45px rgba(0, 0, 0, 0.38);
+}
+
+.explore__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255, 193, 7, 0.94);
+    color: rgba(0, 0, 0, 0.8);
+    font-weight: 900;
+    transform: translateY(8px);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+}
+
+.explore__poster:hover .explore__cta {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* fade while switching */
+.explore__poster.is-fading .explore__img {
+    opacity: 0.35;
+}
+
+/* dots */
+.explore__dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.explore__dotItem {
+    width: 26px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.explore__dotItem.is-active {
+    background: rgba(255, 193, 7, 0.95);
+    border-color: rgba(255, 193, 7, 0.55);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .explore__poster,
+    .explore__img,
+    .explore__chip,
+    .explore__cta {
+        transition: none;
+    }
+}
+
 /* ========== SNOW EFFECT (GLOBAL) ========== */
 #snow-container {
     position: fixed;
@@ -575,7 +1221,7 @@ img {
     }
 
     .auth-form-panel {
-        padding: 2rem 1.5rem ;
+        padding: 2rem 1.5rem;
     }
 }
 
@@ -598,12 +1244,12 @@ img {
     .rm-page-hero::after,
     .rm-soft-badge,
     .rm-card {
-        animation: none ;
+        animation: none;
     }
     .rm-soft-badge,
     .rm-card,
     .rm-icon-pill,
     .rm-icon-pill i {
-        transition: none ;
+        transition: none;
     }
 }

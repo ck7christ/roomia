@@ -381,13 +381,23 @@ class RoomController extends Controller
         if (!$value)
             return null;
 
+        // lower + bỏ dấu
         $v = Str::of($value)->lower()->ascii()->toString();
 
-        $v = preg_replace('/\b(thanh pho|tp\.?|tp|tinh|quan|huyen|thi xa|thi tran|phuong|xa)\b/u', ' ', $v);
+        // BỎ DẤU CÂU (fix case "tp." còn lại dấu chấm)
+        $v = preg_replace('/[^a-z0-9\s]/u', ' ', $v);
+
+        // Bỏ tiền tố hành chính (thêm \s* để bắt cả "thanhpho")
+        $v = preg_replace('/\b(thanh\s*pho|tp|tinh|quan|huyen|thi\s*xa|thi\s*tran|phuong|xa)\b/u', ' ', $v);
+
+        // gọn khoảng trắng
         $v = preg_replace('/\s+/u', ' ', $v);
 
-        return trim($v);
+        $v = trim($v);
+
+        return $v !== '' ? $v : null;
     }
+
 
     /**
      * Nếu JS không set được dropdown id (do lệch text), ta dùng name/code để tự map ra id.
@@ -417,10 +427,21 @@ class RoomController extends Controller
         // Resolve city
         if (empty($data['city_id'])) {
             $cityName = $this->normalizePlace($data['city_name'] ?? null);
+
             if ($cityName) {
-                foreach (City::select('id', 'name')->get() as $c) {
+                $citiesQ = City::select('id', 'name');
+
+                // nếu bảng cities có country_id thì bật dòng này
+                // if (!empty($data['country_id'])) $citiesQ->where('country_id', $data['country_id']);
+
+                foreach ($citiesQ->get() as $c) {
                     $candidate = $this->normalizePlace($c->name);
-                    if ($candidate === $cityName || str_contains($candidate, $cityName)) {
+
+                    if (
+                        $candidate === $cityName
+                        || str_contains($candidate, $cityName)
+                        || str_contains($cityName, $candidate)
+                    ) {
                         $data['city_id'] = $c->id;
                         break;
                     }
@@ -431,10 +452,41 @@ class RoomController extends Controller
         // Resolve district
         if (empty($data['district_id'])) {
             $districtName = $this->normalizePlace($data['district_name'] ?? null);
+
             if ($districtName) {
-                foreach (District::select('id', 'name')->get() as $d) {
+                $districtsQ = District::select('id', 'name');
+                if (!empty($data['city_id'])) {
+                    $districtsQ->where('city_id', $data['city_id']);
+                }
+
+                foreach ($districtsQ->get() as $d) {
                     $candidate = $this->normalizePlace($d->name);
-                    if ($candidate === $districtName || str_contains($candidate, $districtName)) {
+
+                    if (
+                        $candidate === $districtName
+                        || str_contains($candidate, $districtName)
+                        || str_contains($districtName, $candidate)
+                    ) {
+                        $data['district_id'] = $d->id;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Fallback: nếu vẫn chưa ra district_id, thử dò từ formatted_address (rất hợp case "Thành phố ...")
+        if (empty($data['district_id']) && !empty($data['city_id']) && !empty($data['formatted_address'])) {
+            $haystack = $this->normalizePlace($data['formatted_address']);
+
+            if ($haystack) {
+                $districts = District::select('id', 'name')
+                    ->where('city_id', $data['city_id'])
+                    ->get();
+
+                foreach ($districts as $d) {
+                    $needle = $this->normalizePlace($d->name);
+
+                    if ($needle && str_contains($haystack, $needle)) {
                         $data['district_id'] = $d->id;
                         break;
                     }

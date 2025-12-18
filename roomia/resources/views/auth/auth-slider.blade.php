@@ -114,7 +114,7 @@
                                 <h3 class="fw-bold mb-1">Create Account</h3>
                                 <p class="small text-muted mb-4">Fill out the information below to register.</p>
 
-                                <form method="POST" action="{{ route('register') }}">
+                                <form method="POST" action="{{ route('register.store') }}">
                                     @csrf
 
                                     {{-- Name --}}
@@ -171,9 +171,8 @@
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-lock"></i>
                                             </span>
-                                            <input id="password_confirmation" type="password"
-                                                name="password_confirmation" class="form-control" required
-                                                autocomplete="new-password">
+                                            <input id="password_confirmation" type="password" name="password_confirmation"
+                                                class="form-control" required autocomplete="new-password">
                                         </div>
                                     </div>
                                     <div class="text-center">
