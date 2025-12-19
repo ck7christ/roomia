@@ -143,14 +143,18 @@
                     <div class="col-12">
                         <div class="mb-0">
                             <label class="form-label">Bản đồ</label>
+                            @include('partials.general.map', [
+                                'mode' => 'edit',
+                                'lat' => old('lat', $addr->lat ?? ''),
+                                'lng' => old('lng', $addr->lng ?? ''),
+                                'latInput' => '#lat',
+                                'lngInput' => '#lng',
+                                'autocompleteInput' => '#formatted_address',
+                                'formattedInput' => '#formatted_address',
+                                'streetInput' => '#street',
+                                'heightClass' => 'rm-map-h320',
+                            ])
 
-                            <div data-room-map data-mode="edit" data-lat="{{ old('lat', $addr->lat ?? '') }}"
-                                data-lng="{{ old('lng', $addr->lng ?? '') }}" data-lat-input="#lat"
-                                data-lng-input="#lng" data-autocomplete-input="#formatted_address"
-                                data-formatted-input="#formatted_address" data-street-input="#street">
-                                {{-- giữ class room-map nếu bạn đang có CSS cũ --}}
-                                <div class="rm-map-canvas room-map border rounded"></div>
-                            </div>
 
                             <div class="form-text">
                                 Gõ địa chỉ ở ô “Địa chỉ đầy đủ” để chọn gợi ý, hoặc click/kéo marker để cập nhật vị trí.
