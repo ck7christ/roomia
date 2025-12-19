@@ -1,6 +1,6 @@
 {{-- resources/views/host/bookings/index.blade.php --}}
 @extends('layouts.host')
-
+@section('title', 'Thanh Toán')
 @section('content')
     <div class="container py-4">
 
@@ -91,7 +91,7 @@
                                     <td class="text-end">
                                         <a href="{{ route('host.bookings.show', $booking) }}"
                                             class="btn btn-outline-primary btn-sm">
-                                            <i class="fa fa-eye me-1"></i> Xem
+                                            <i class="fa fa-eye me-1" title="Xem"></i> 
                                         </a>
                                     </td>
                                 </tr>

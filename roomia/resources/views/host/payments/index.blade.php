@@ -14,7 +14,7 @@
 
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>Payments</strong>
+                <strong>Thanh Toán</strong>
                 <span class="text-muted small">
                     Tổng:
                     {{ method_exists($payments, 'total') ? $payments->total() : $payments->count() }}
@@ -42,7 +42,7 @@
                                 @php
                                     $status = strtolower($payment->status ?? 'pending');
                                     $badge = match ($status) {
-                                        'paid', 'completed', 'succeeded' => 'bg-success',
+                                        'paid', 'completed', 'success' => 'bg-success',
                                         'failed' => 'bg-danger',
                                         'refunded' => 'bg-secondary',
                                         default => 'bg-warning text-dark',
@@ -95,7 +95,7 @@
                                     <td class="text-end">
                                         <a href="{{ route('host.payments.show', $payment) }}"
                                             class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-eye me-1"></i>Xem
+                                            <i class="fas fa-eye me-1" title="Xem"></i>
                                         </a>
                                     </td>
                                 </tr>

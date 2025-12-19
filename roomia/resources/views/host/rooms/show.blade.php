@@ -145,7 +145,7 @@
 
                                     <td class="text-center">
                                         <span
-                                            class="badge @if ($type->status == 'inactive') bg-secondary @else bg-warning text-dark @endif">
+                                            class="badge @if ($type->status == 'active') bg-success @else bg-warning text-dark @endif">
                                             {{ $type->status }}
                                         </span>
                                     </td>

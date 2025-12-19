@@ -1,7 +1,10 @@
 @php
-    // ✅ Search nên đi về danh sách phòng public (/rooms) để ai cũng dùng được
-    $action = Route::has('rooms.index') ? route('rooms.index') : (Route::has('rooms.show') ? url('/rooms') : '#');
-
+    // Search nên đi về danh sách phòng public (/rooms) để ai cũng dùng được
+    $action = Route::has('search.index')
+        ? route('search.index')
+        : (Route::has('rooms.index')
+            ? route('rooms.index')
+            : url('/rooms'));
     // default values (có thể lấy từ query để giữ state)
     $adults = (int) request('adults', 2);
     $children = (int) request('children', 0);
