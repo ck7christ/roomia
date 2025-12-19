@@ -34,7 +34,7 @@ class RoomController extends Controller
             });
         }
 
-        // ✅ tìm theo địa điểm (input destination)
+        // tìm theo địa điểm (input destination)
         if ($request->filled('destination')) {
             $term = $this->normalizePlace($request->destination);
 

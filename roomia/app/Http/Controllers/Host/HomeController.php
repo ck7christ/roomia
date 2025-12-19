@@ -149,13 +149,11 @@ class HomeController extends Controller
             ->whereIn('status', [Booking::STATUS_PENDING, Booking::STATUS_CONFIRMED, Booking::STATUS_COMPLETED])
             ->get(['created_at', 'total_price']);
 
-        $monthlyRevenue = collect();
         for ($i = 5; $i >= 0; $i--) {
             $m = $now->copy()->subMonths($i);
             $key = $m->format('Y-m');
             $monthlyRevenue[$key] = ['month' => $m->format('m/Y'), 'revenue' => 0, 'bookings' => 0];
         }
-
         foreach ($monthlyRaw as $b) {
             $key = Carbon::parse($b->created_at)->format('Y-m');
             if (isset($monthlyRevenue[$key])) {

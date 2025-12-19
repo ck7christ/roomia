@@ -16,19 +16,22 @@ class ReviewController extends Controller
     public function index()
     {
         //
-        $host = Auth::user();
+        $hostId = auth()->id();
 
-        $reviews = Review::with([
-            'booking.roomType.room',
-            'booking.guest',
+    $reviews = Review::query()
+        ->with([
+            'booking:id,guest_id,room_type_id,check_in,check_out',
+            'booking.guest:id,name,email',
+            'booking.roomType:id,room_id,name',
+            'booking.roomType.room:id,host_id,title',
         ])
-            ->whereHas('booking.roomType.room', function ($query) use ($host) {
-                $query->where('host_id', $host->id);
-            })
-            ->latest()
-            ->paginate(20);
+        ->whereHas('booking.roomType.room', function ($q) use ($hostId) {
+            $q->where('host_id', $hostId);
+        })
+        ->latest()
+        ->paginate(20);
 
-        return view('host.reviews.index', compact('reviews'));
+    return view('host.reviews.index', compact('reviews'));
     }
 
     /**

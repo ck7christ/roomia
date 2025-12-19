@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Route;
+
 class HomeController extends Controller
 {
     public function index(Request $request)
@@ -193,7 +195,7 @@ class HomeController extends Controller
     public function search(Request $request)
     {
         $data = $request->validate([
-            'location' => ['nullable', 'string', 'max:255'],
+            'destination' => ['nullable', 'string', 'max:255'],
             'check_in' => ['nullable', 'date'],
             'check_out' => ['nullable', 'date', 'after:check_in'],
             'adults' => ['nullable', 'integer', 'min:1', 'max:20'],
@@ -201,7 +203,14 @@ class HomeController extends Controller
             'rooms' => ['nullable', 'integer', 'min:1', 'max:10'],
         ]);
 
-        $this->storeRecentSearchToSession($data);
+        $this->storeRecentSearchToSession([
+            'location' => $data['destination'] ?? null,
+            'check_in' => $data['check_in'] ?? null,
+            'check_out' => $data['check_out'] ?? null,
+            'adults' => $data['adults'] ?? 2,
+            'children' => $data['children'] ?? 0,
+            'rooms' => $data['rooms'] ?? 1,
+        ]);
 
         $targets = [
             'guest.rooms.index',
@@ -221,12 +230,21 @@ class HomeController extends Controller
 
     private function storeRecentSearchToSession(array $data, int $limit = 6): void
     {
-        if (empty($data['location'])) {
+        $rawLocation = $data['location'] ?? '';
+
+        if (trim($rawLocation) === '') {
             return;
         }
 
+        // 1) Chuẩn hoá để HIỂN THỊ (gọn khoảng trắng)
+        $displayLocation = Str::squish(trim($rawLocation));
+
+        // 2) Chuẩn hoá để DEDUPE (chống trùng hoa/thường/khoảng trắng)
+        $normalizedLocation = $this->normalizePlace($displayLocation);
+
+        // 3) Payload lưu session (giữ y như cấu trúc cũ của bạn)
         $payload = [
-            'location' => $data['location'] ?? null,
+            'location' => $displayLocation, // hiển thị
             'check_in' => $data['check_in'] ?? null,
             'check_out' => $data['check_out'] ?? null,
             'adults' => (int) ($data['adults'] ?? 2),
@@ -234,16 +252,38 @@ class HomeController extends Controller
             'rooms' => (int) ($data['rooms'] ?? 1),
         ];
 
-        $signature = md5(json_encode($payload));
+        // 4) Signature dùng location đã normalize để tránh trùng "HCM" vs "hcm"
+        $signaturePayload = $payload;
+        $signaturePayload['location'] = $normalizedLocation;
+
+        $signature = md5(json_encode($signaturePayload));
         $payload['signature'] = $signature;
 
+        // 5) Đọc list hiện tại + loại item trùng signature
         $list = session('recent_searches', []);
         $list = is_array($list) ? $list : [];
 
-        $list = array_values(array_filter($list, fn($x) => is_array($x) && (($x['signature'] ?? '') !== $signature)));
+        $list = array_values(array_filter(
+            $list,
+            fn($x) => is_array($x) && (($x['signature'] ?? '') !== $signature)
+        ));
+
+        // 6) Đẩy item mới lên đầu + giới hạn số lượng
         array_unshift($list, $payload);
         $list = array_slice($list, 0, $limit);
 
         session(['recent_searches' => $list]);
+    }
+    private function normalizePlace(?string $value): ?string
+    {
+        if (!$value)
+            return null;
+
+        $v = Str::of($value)->lower()->ascii()->toString();
+        $v = preg_replace('/[^a-z0-9\s]/u', ' ', $v);
+        $v = preg_replace('/\b(thanh\s*pho|tp|tinh|quan|huyen|thi\s*xa|thi\s*tran|phuong|xa)\b/u', ' ', $v);
+        $v = preg_replace('/\s+/u', ' ', trim($v));
+
+        return $v !== '' ? $v : null;
     }
 }

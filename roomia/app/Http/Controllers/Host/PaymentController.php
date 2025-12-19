@@ -19,7 +19,11 @@ class PaymentController extends Controller
         //
         $hostId = Auth::id();
 
-        $payments = Payment::with(['booking.roomType.room', 'guest'])
+
+        $payments = Payment::with([
+            'booking.roomType.room',
+            'booking.guest',
+        ])
             ->whereHas('booking.roomType.room', function ($q) use ($hostId) {
                 $q->where('host_id', $hostId);
             })
@@ -54,7 +58,7 @@ class PaymentController extends Controller
         //
         $this->authorizePayment($payment);
 
-        $payment->load(['booking.roomType.room', 'guest']);
+        $payment->load(['booking.roomType.room', 'booking.guest']);
 
         return view('host.payments.show', compact('payment'));
     }

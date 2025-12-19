@@ -14,6 +14,17 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".rs-btn");
+        if (!btn) return;
+
+        const target = btn.getAttribute("data-rs-target");
+        const dir = parseInt(btn.getAttribute("data-rs-dir") || "1", 10);
+        const track = document.querySelector(target);
+        if (!track) return;
+
+        track.scrollBy({ left: track.clientWidth * dir, behavior: "smooth" });
+    });
 
     // ===== Snow effect =====
     const SNOWFLAKE_COUNT = 60;

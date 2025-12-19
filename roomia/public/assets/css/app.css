@@ -1108,6 +1108,207 @@ img {
     }
 }
 
+/* =========================
+   Recent searches slider (Roomia)
+   ========================= */
+
+.rs-wrap {
+    position: relative;
+}
+
+/* Track slider */
+.rs-track {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+.rs-slide {
+    scroll-snap-align: start;
+}
+
+/* Scrollbar (solid) */
+.rs-track::-webkit-scrollbar {
+    height: 0;
+}
+.rs-track::-webkit-scrollbar-thumb {
+    background: var(--rm-gray-600);
+    border-radius: var(--rm-radius-pill);
+}
+.rs-track::-webkit-scrollbar-track {
+    background: var(--rm-surface);
+    border-radius: var(--rm-radius-pill);
+}
+
+/* Card: viền primary nhẹ + stripe accent (solid) */
+.rs-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--rm-white);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+/* Viền primary “nhẹ” bằng pseudo + opacity (không cần color-mix) */
+.rs-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid var(--rm-primary);
+    opacity: 0.14;
+    pointer-events: none;
+}
+
+/* Stripe accent ở cạnh trái cho nổi bật */
+.rs-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--rm-accent);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+/* Hover: nổi hơn, viền rõ hơn */
+.rs-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--rm-shadow-strong);
+}
+.rs-card:hover::after {
+    opacity: 0.22;
+}
+
+/* Icon: nền tint primary (solid + opacity) */
+.rs-icon {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    color: var(--rm-primary);
+}
+.rs-icon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--rm-primary);
+    opacity: 0.08;
+    pointer-events: none;
+}
+/* icon nằm trên lớp nền */
+.rs-icon > i {
+    position: relative;
+    z-index: 1;
+}
+
+/* Chấm accent nhỏ để “đặc biệt” hơn (không gradient) */
+.rs-icon::after {
+    content: "";
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: var(--rm-radius-pill);
+    background: var(--rm-accent);
+    box-shadow: 0 0 0 2px var(--rm-white); /* tách nền */
+    pointer-events: none;
+}
+
+/* Text */
+.rs-card .fw-semibold {
+    color: var(--rm-primary);
+}
+.rs-card .text-muted {
+    color: var(--rm-gray-600) !important;
+}
+
+/* Badge: viền primary nhẹ */
+.rs-card .badge {
+    position: relative;
+    background: var(--rm-surface) !important;
+    color: var(--rm-primary) !important;
+    border: 0 !important;
+    border-radius: var(--rm-radius-pill);
+}
+.rs-card .badge::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid var(--rm-primary);
+    opacity: 0.12;
+    pointer-events: none;
+}
+.rs-card:hover .badge::after {
+    border-color: var(--rm-accent);
+    opacity: 0.25;
+}
+
+/* Nút điều hướng: primary + hover tint (không gradient) */
+.rs-btn {
+    position: relative;
+    border-radius: var(--rm-radius-pill);
+    border: 1px solid var(--rm-primary);
+    background: var(--rm-white);
+    color: var(--rm-primary);
+    overflow: hidden;
+}
+.rs-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--rm-primary);
+    opacity: 0;
+    pointer-events: none;
+}
+.rs-btn:hover::before {
+    opacity: 0.06;
+}
+.rs-btn > * {
+    position: relative;
+    z-index: 1;
+}
+.rs-btn:focus {
+    outline: 3px solid var(--rm-focus-outline);
+    outline-offset: 2px;
+}
+
+/* Fade 2 bên để nhìn giống slider “xịn” */
+.rs-wrap::before,
+.rs-wrap::after {
+    content: "";
+    position: absolute;
+    top: 40px; /* dưới header */
+    bottom: 0;
+    width: 44px;
+    pointer-events: none;
+    z-index: 2;
+}
+.rs-wrap::before {
+    left: 0;
+    background: linear-gradient(
+        to right,
+        var(--rm-white),
+        rgba(255, 255, 255, 0)
+    );
+}
+.rs-wrap::after {
+    right: 0;
+    background: linear-gradient(
+        to left,
+        var(--rm-white),
+        rgba(255, 255, 255, 0)
+    );
+}
+
 /* ========== SNOW EFFECT (GLOBAL) ========== */
 #snow-container {
     position: fixed;
