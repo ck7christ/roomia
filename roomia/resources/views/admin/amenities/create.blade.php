@@ -1,23 +1,47 @@
-<x-app-layout>
-    <h1>Thêm tiện nghi mới</h1>
+{{-- resources/views/admin/amenities/create.blade.php --}}
+@extends('layouts.admin')
 
-    @if ($errors->any())
-        <div>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>- {{ $error }}</li>
-                @endforeach
-            </ul>
+@section('title', 'Thêm tiện nghi')
+
+@section('content')
+    <div class="p-3 p-lg-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div>
+                <h1 class="h4 mb-1">Thêm tiện nghi</h1>
+                <div class="text-muted small">Tạo mới tiện nghi để gán cho phòng.</div>
+            </div>
+
+            <a href="{{ route('admin.amenities.index') }}" class="btn btn-outline-primary">
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+            </a>
         </div>
-    @endif
 
-    <form action="{{ route('admin.amenities.store') }}" method="POST">
-        @csrf
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <div class="fw-semibold mb-1">Vui lòng kiểm tra lại thông tin:</div>
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-        @include('admin.amenities._form', ['amenity' => $amenity])
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ route('admin.amenities.store') }}" method="POST" class="vstack gap-3">
+                    @csrf
 
-        <p>
-            <button type="submit">Lưu</button>
-        </p>
-    </form>
-</x-app-layout>
+                    @include('admin.amenities._form', ['amenity' => $amenity ?? null])
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ route('admin.amenities.index') }}" class="btn btn-outline-primary">Hủy</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Lưu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection

@@ -85,7 +85,7 @@
             $badge = match ($status) {
                 'pending', 'pending_payment' => 'warning',
                 'confirmed' => 'primary',
-                'paid' => 'success',
+                'paid','completed' => 'success',
                 'cancelled' => 'secondary',
                 default => 'light',
             };
@@ -108,7 +108,7 @@
 
             @if ($canPay)
                 <a class="btn btn-primary btn-sm me-1" href="{{ route('guest.bookings.payments.create', $booking) }}">
-                    <i class="fa-solid fa-credit-card"></i> Thanh toán
+                    <i class="fa-solid fa-credit-card" title="Thanh Toán"></i>
                 </a>
             @endif
 

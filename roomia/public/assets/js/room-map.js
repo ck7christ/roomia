@@ -165,9 +165,56 @@
             }
         }
     }
+    function initRoomsListMap() {
+        document.querySelectorAll("[data-rooms-list-map]").forEach((wrap) => {
+            const canvas = wrap.querySelector(".rm-map-canvas");
+            if (!canvas || !window.google?.maps) return;
+
+            let rooms = [];
+            try {
+                rooms = JSON.parse(wrap.getAttribute("data-rooms") || "[]");
+            } catch (e) {
+                rooms = [];
+            }
+            if (!rooms.length) return;
+
+            const map = new google.maps.Map(canvas, {
+                center: { lat: 10.7769, lng: 106.7009 },
+                zoom: 6,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true,
+            });
+
+            const bounds = new google.maps.LatLngBounds();
+            const info = new google.maps.InfoWindow();
+
+            rooms.forEach((r) => {
+                const lat = parseFloat(r.lat);
+                const lng = parseFloat(r.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+                const pos = { lat, lng };
+                const marker = new google.maps.Marker({ map, position: pos });
+                bounds.extend(pos);
+
+                marker.addListener("click", () => {
+                    const title = (r.title || "").replace(/</g, "&lt;");
+                    info.setContent(
+                        `<div style="font-weight:600;margin-bottom:4px;">${title}</div>
+           <a href="${r.url}">Xem chi tiết</a>`
+                    );
+                    info.open({ map, anchor: marker });
+                });
+            });
+
+            if (!bounds.isEmpty()) map.fitBounds(bounds);
+        });
+    }
 
     // callback cho Google Maps script
     window.initRoomMap = function () {
         document.querySelectorAll("[data-room-map]").forEach(initOne);
+        initRoomsListMap();
     };
 })();

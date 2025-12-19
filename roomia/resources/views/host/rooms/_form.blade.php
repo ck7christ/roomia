@@ -154,8 +154,6 @@
                                 'streetInput' => '#street',
                                 'heightClass' => 'rm-map-h320',
                             ])
-
-
                             <div class="form-text">
                                 Gõ địa chỉ ở ô “Địa chỉ đầy đủ” để chọn gợi ý, hoặc click/kéo marker để cập nhật vị trí.
                             </div>

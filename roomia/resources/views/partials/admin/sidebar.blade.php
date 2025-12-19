@@ -10,6 +10,7 @@
         ['label' => 'Bookings', 'icon' => 'fa-calendar-check', 'route' => 'admin.bookings.index'],
         ['label' => 'Payments', 'icon' => 'fa-credit-card', 'route' => 'admin.payments.index'],
         ['label' => 'Vouchers', 'icon' => 'fa-ticket', 'route' => 'admin.vouchers.index'],
+        ['label' => 'Amenities', 'icon' => 'fa-bell-concierge', 'route' => 'admin.amenities.index'],
     ];
 @endphp
 

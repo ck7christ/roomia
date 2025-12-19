@@ -61,6 +61,15 @@ class RoomController extends Controller
             ->orderBy('name')
             ->get();
 
+        $mapRooms = $rooms->map(fn($r) => [
+            'id' => $r->id,
+            'title' => $r->title,
+            'lat' => $r->address?->lat,
+            'lng' => $r->address?->lng,
+            'url' => route('rooms.show', $r),
+        ])->filter(fn($x) => $x['lat'] && $x['lng'])->values();
+
+
         return view('guest.rooms.index', compact('rooms', 'cities', 'amenities'));
     }
 

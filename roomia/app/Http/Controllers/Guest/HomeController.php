@@ -88,7 +88,7 @@ class HomeController extends Controller
             )
             ->groupBy('cities.id', 'cities.name')
             ->orderByDesc('rooms_count')
-            ->limit(5)
+            ->limit(4)
             ->get();
 
         $popularDestinations = $exploreCitiesRaw->map(function ($c) {

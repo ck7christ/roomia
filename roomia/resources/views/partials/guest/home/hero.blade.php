@@ -45,12 +45,9 @@
                         <p class="hero-subtitle">{{ $s['subtitle'] }}</p>
 
                         <div class="d-flex gap-2 flex-wrap">
-                            <button type="button" class="btn btn-light btn-sm hero-scroll">
+                            <a class="btn btn-light btn-sm hero-scroll"
+                                href="{{ Route::has('rooms.index') ? route('rooms.index') : '#' }}">
                                 {{ $s['cta'] }}
-                            </button>
-                            <a class="btn btn-outline-light btn-sm"
-                                href="{{ Route::has('guest.rooms.index') ? route('guest.rooms.index') : '#' }}">
-                                Xem chỗ ở
                             </a>
                         </div>
                     </div>

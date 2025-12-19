@@ -55,21 +55,27 @@
                                 </td>
                                 <td class="text-muted">
                                     {{ $v->used_count }}
-                                    @if($v->usage_limit) / {{ $v->usage_limit }} @endif
+                                    @if ($v->usage_limit)
+                                        / {{ $v->usage_limit }}
+                                    @endif
                                 </td>
                                 <td>
                                     @include('partials.admin.vouchers.status', ['voucher' => $v])
                                 </td>
                                 <td class="text-end">
                                     <a class="btn btn-sm btn-outline-primary"
-                                        href="{{ route('admin.vouchers.show', $v) }}">Xem</a>
+                                        href="{{ route('admin.vouchers.show', $v) }}"><i class="fa-solid fa-eye"
+                                            title="Xem"></i></a>
                                     <a class="btn btn-sm btn-outline-secondary"
-                                        href="{{ route('admin.vouchers.edit', $v) }}">Sửa</a>
-                                    <form class="d-inline" method="POST" action="{{ route('admin.vouchers.destroy', $v) }}"
+                                        href="{{ route('admin.vouchers.edit', $v) }}"><i
+                                            class="fa-regular fa-pen-to-square" title="Sửa"></i></a>
+                                    <form class="d-inline" method="POST"
+                                        action="{{ route('admin.vouchers.destroy', $v) }}"
                                         onsubmit="return confirm('Xóa voucher này?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger" type="submit">Xóa</button>
+                                        <button class="btn btn-sm btn-outline-danger" type="submit"><i
+                                                class="fa-solid fa-trash"title="Xóa"></i></button>
                                     </form>
                                 </td>
                             </tr>

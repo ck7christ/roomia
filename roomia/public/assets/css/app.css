@@ -30,7 +30,7 @@
 
     /* Sizing */
     --rm-brand-icon-size: 32px;
-    --rm-radius-pill: 999px;
+    --rm-radius-pill: 10px;
 }
 
 /* ========== BASE ========== */
@@ -40,22 +40,168 @@ body {
 }
 
 /* ========== BUTTONS ========== */
+
+/* (Tuỳ chọn) đồng bộ style cơ bản cho mọi button */
+.btn {
+    border-radius: var(--rm-radius-pill);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+/* Focus ring theo brand (đè focus của Bootstrap) */
+.btn:focus,
+.btn:focus-visible {
+    outline: 0;
+    /* fallback (ổn định) */
+    box-shadow: 0 0 0 0.25rem rgba(153, 194, 255, 0.45);
+}
+
+/* =========================
+   PRIMARY (Brand)
+   ========================= */
 .btn-primary {
-    background: var(--rm-primary);
-    color: var(--rm-white);
+    --bs-btn-color: var(--rm-white);
+    --bs-btn-bg: var(--rm-primary);
+    --bs-btn-border-color: var(--rm-primary);
+
+    --bs-btn-hover-color: var(--rm-white);
+    --bs-btn-hover-bg: var(--rm-primary-hover);
+    --bs-btn-hover-border-color: var(--rm-primary-hover);
+
+    --bs-btn-active-color: var(--rm-white);
+    --bs-btn-active-bg: var(--rm-primary-active);
+    --bs-btn-active-border-color: var(--rm-primary-active);
+
+    --bs-btn-disabled-color: var(--rm-white);
+    --bs-btn-disabled-bg: var(--rm-primary);
+    --bs-btn-disabled-border-color: var(--rm-primary);
 }
-.btn-primary:hover {
-    background: var(--rm-primary-hover);
-    color: var(--rm-white);
+
+.btn-outline-primary {
+    --bs-btn-color: var(--rm-primary);
+    --bs-btn-border-color: var(--rm-primary);
+
+    --bs-btn-hover-color: var(--rm-white);
+    --bs-btn-hover-bg: var(--rm-primary);
+    --bs-btn-hover-border-color: var(--rm-primary);
+
+    --bs-btn-active-color: var(--rm-white);
+    --bs-btn-active-bg: var(--rm-primary-active);
+    --bs-btn-active-border-color: var(--rm-primary-active);
+
+    --bs-btn-disabled-color: var(--rm-primary);
+    --bs-btn-disabled-border-color: var(--rm-primary);
 }
-.btn-primary:focus {
-    background: var(--rm-primary-focus);
-    outline: 2px solid var(--rm-focus-outline);
-    color: var(--rm-white);
+
+/* Cho trường hợp dùng btn-check (Bootstrap toggle buttons) */
+.btn-check:checked + .btn-primary,
+.btn-check:active + .btn-primary,
+.btn-primary:active,
+.btn-primary.active {
+    background-color: var(--rm-primary-active);
+    border-color: var(--rm-primary-active);
 }
-.btn-primary:active {
-    background: var(--rm-primary-active);
-    color: var(--rm-white);
+
+/* =========================
+   ACCENT (map warning -> accent)
+   ========================= */
+.btn-warning {
+    --bs-btn-color: #111;
+    --bs-btn-bg: var(--rm-accent);
+    --bs-btn-border-color: var(--rm-accent);
+
+    --bs-btn-hover-color: #111;
+    --bs-btn-hover-bg: var(--rm-accent);
+    --bs-btn-hover-border-color: var(--rm-accent);
+
+    --bs-btn-active-color: #111;
+    --bs-btn-active-bg: var(--rm-accent);
+    --bs-btn-active-border-color: var(--rm-accent);
+
+    --bs-btn-disabled-color: #111;
+    --bs-btn-disabled-bg: var(--rm-accent);
+    --bs-btn-disabled-border-color: var(--rm-accent);
+}
+
+.btn-outline-warning {
+    --bs-btn-color: var(--rm-accent);
+    --bs-btn-border-color: var(--rm-accent);
+
+    --bs-btn-hover-color: #111;
+    --bs-btn-hover-bg: var(--rm-accent);
+    --bs-btn-hover-border-color: var(--rm-accent);
+
+    --bs-btn-active-color: #111;
+    --bs-btn-active-bg: var(--rm-accent);
+    --bs-btn-active-border-color: var(--rm-accent);
+
+    --bs-btn-disabled-color: var(--rm-accent);
+    --bs-btn-disabled-border-color: var(--rm-accent);
+}
+
+/* =========================
+   SECONDARY / LIGHT / LINK (nhẹ nhàng theo neutral)
+   ========================= */
+.btn-secondary {
+    --bs-btn-color: var(--rm-white);
+    --bs-btn-bg: var(--rm-gray-600);
+    --bs-btn-border-color: var(--rm-gray-600);
+}
+
+.btn-light {
+    --bs-btn-color: var(--rm-primary);
+    --bs-btn-bg: var(--rm-surface);
+    --bs-btn-border-color: var(--rm-surface);
+}
+
+.btn-link {
+    color: var(--rm-primary);
+}
+.btn-link:hover {
+    color: var(--rm-primary-hover);
+}
+
+/* Disabled chung */
+.btn:disabled,
+.btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+/* =========================
+   OUTLINE SECONDARY (Brand-soft, không xám)
+   ========================= */
+.btn-outline-secondary {
+    /* mặc định: chữ xanh brand, viền xanh nhạt, nền trắng */
+    --bs-btn-color: var(--rm-primary);
+    --bs-btn-bg: var(--rm-white);
+
+    /* nếu trình duyệt hỗ trợ color-mix thì viền sẽ “nhẹ” hơn primary */
+    --bs-btn-border-color: color-mix(in srgb, var(--rm-primary) 55%, white);
+
+    --bs-btn-hover-color: var(--rm-white);
+    --bs-btn-hover-bg: var(--rm-primary);
+    --bs-btn-hover-border-color: var(--rm-primary);
+
+    --bs-btn-active-color: var(--rm-white);
+    --bs-btn-active-bg: var(--rm-primary-active);
+    --bs-btn-active-border-color: var(--rm-primary-active);
+
+    --bs-btn-disabled-color: var(--rm-primary);
+    --bs-btn-disabled-bg: var(--rm-white);
+    --bs-btn-disabled-border-color: color-mix(
+        in srgb,
+        var(--rm-primary) 35%,
+        white
+    );
+}
+
+/* Fallback cho browser không hỗ trợ color-mix */
+@supports not (color: color-mix(in srgb, black, white)) {
+    .btn-outline-secondary {
+        --bs-btn-border-color: var(--rm-primary);
+        --bs-btn-disabled-border-color: var(--rm-primary);
+    }
 }
 
 img {
@@ -269,6 +415,172 @@ img {
     max-height: 80vh;
     width: 100%;
     object-fit: contain;
+}
+
+/* Room show/index (guest) */
+.rm-room-show .rm-title {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #111;
+}
+.rm-rooms-index .rm-title {
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    color: #111;
+}
+.rm-text {
+    color: #111;
+    line-height: 1.65;
+}
+
+.rm-card-soft {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+}
+
+.rm-section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rm-section-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111;
+}
+
+.rm-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: var(--rm-radius-pill);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 59, 149, 0.06);
+    color: var(--rm-primary);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.rm-text-primary {
+    color: var(--rm-primary);
+}
+.rm-text-accent {
+    color: var(--rm-accent);
+}
+
+.rm-select {
+    border-radius: 12px;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+.rm-amenity {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: var(--rm-white);
+}
+
+.rm-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.08);
+    margin: 0.9rem 0;
+}
+
+.rm-empty {
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--rm-surface);
+    border: 1px dashed rgba(0, 0, 0, 0.18);
+    color: var(--rm-gray-600);
+}
+
+/* Map height helpers (no inline) */
+.rm-map-h320 {
+    height: 320px;
+}
+.rm-room-card {
+    overflow: hidden;
+}
+
+.rm-room-cover {
+    display: block;
+    position: relative;
+    text-decoration: none;
+}
+
+.rm-cover-frame {
+    background: var(--rm-surface);
+}
+
+.rm-cover-img {
+    object-fit: cover;
+    transition: transform 0.25s ease;
+}
+
+.rm-room-cover:hover .rm-cover-img {
+    transform: scale(1.03);
+}
+
+.rm-cover-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--rm-gray-600);
+    font-size: 1.25rem;
+}
+
+.rm-room-badges {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    z-index: 2;
+}
+.rm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.6rem;
+    border-radius: var(--rm-radius-pill);
+    background: var(--rm-accent);
+    color: #fff;
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    font-weight: bold;
+}
+
+.rm-badge-soft {
+    background: var(--rm-primary);
+    color: var(--rm-white);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.rm-room-title {
+    display: inline-block;
+    font-weight: 800;
+    color: #111;
+    text-decoration: none;
+}
+
+.rm-room-title:hover {
+    color: var(--rm-primary);
+    text-decoration: underline;
+}
+/* Sticky sidebar (desktop) */
+@media (min-width: 992px) {
+    .rm-sticky {
+        position: sticky;
+        top: 88px;
+    }
 }
 
 /* ====== destinations card =========== */
@@ -1108,6 +1420,14 @@ img {
     .explore__cta {
         transition: none;
     }
+}
+.explore__videoCard {
+    padding: 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(var(--rm-navbar-blur));
+    -webkit-backdrop-filter: blur(var(--rm-navbar-blur));
 }
 
 /* =========================
