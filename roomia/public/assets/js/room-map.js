@@ -1,172 +1,173 @@
 // public/assets/js/room-map.js
-window.initRoomMap = function () {
-    const mapEl = document.getElementById("room-map");
-    if (!mapEl) return;
-
-    const latAttr = parseFloat(mapEl.dataset.lat);
-    const lngAttr = parseFloat(mapEl.dataset.lng);
-
-    const center = {
-        lat: isNaN(latAttr) ? 10.762622 : latAttr,
-        lng: isNaN(lngAttr) ? 106.660172 : lngAttr,
-    };
-
-    const latInput = document.getElementById("lat");
-    const lngInput = document.getElementById("lng");
-
-    const map = new google.maps.Map(mapEl, { center, zoom: 15 });
-
-    let marker = new google.maps.Marker({
-        position: center,
-        map,
-        draggable: true,
-    });
-
-    function updateInputs(pos) {
-        if (!latInput || !lngInput) return;
-        latInput.value = pos.lat();
-        lngInput.value = pos.lng();
+(function () {
+    function qs(sel, root = document) {
+        return sel ? root.querySelector(sel) : null;
     }
 
-    updateInputs(marker.getPosition());
-
-    map.addListener("click", (e) => {
-        marker.setPosition(e.latLng);
-        updateInputs(e.latLng);
-    });
-
-    marker.addListener("dragend", () => {
-        updateInputs(marker.getPosition());
-    });
-
-    // ========================
-    // AUTOCOMPLETE ĐỊA CHỈ
-    // ========================
-    const streetInput = document.getElementById("street");
-    const formattedInput = document.getElementById("formatted_address");
-
-    // 3 select ẩn (vẫn submit bình thường)
-    const countrySelect = document.getElementById("country_id");
-    const citySelect = document.getElementById("city_id");
-    const districtSelect = document.getElementById("district_id");
-
-    // ✅ NEW: hidden name/code để backend map
-    const countryNameInput = document.getElementById("country_name");
-    const countryCodeInput = document.getElementById("country_code");
-    const cityNameInput = document.getElementById("city_name");
-    const districtNameInput = document.getElementById("district_name");
-
-    // Chuẩn hoá text để so khớp (bỏ dấu, bỏ tiền tố hành chính, bỏ ký tự thừa)
-    function normalizeText(text) {
-        return (text || "")
-            .toString()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "") // bỏ dấu
-            .toLowerCase()
-            .replace(
-                /\b(thanh pho|tp\.?|tinh|quan|huyen|thi xa|thi tran|phuong|xa)\b/g,
-                ""
-            )
-            .replace(/[^\w\s]/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
+    function num(v) {
+        const n = parseFloat(v);
+        return Number.isFinite(n) ? n : null;
     }
 
-    // Chọn option theo text (so khớp “mềm”)
-    function selectByText(selectEl, text) {
-        if (!selectEl || !text) return false;
-
-        const target = normalizeText(text);
-        if (!target) return false;
-
-        const options = Array.from(selectEl.options || []);
-
-        // 1) match tuyệt đối sau normalize
-        let found = options.find((opt) => normalizeText(opt.text) === target);
-
-        // 2) fallback match contains (đề phòng DB có “Thành phố Đà Nẵng”)
-        if (!found) {
-            found = options.find((opt) =>
-                normalizeText(opt.text).includes(target)
-            );
-        }
-
-        if (found) {
-            // set value chắc chắn
-            selectEl.value = found.value;
-            // bắn change để các đoạn JS khác (nếu có) bắt sự kiện
-            selectEl.dispatchEvent(new Event("change", { bubbles: true }));
-            return true;
-        }
-        return false;
+    function setVal(el, v) {
+        if (!el) return;
+        el.value = (v ?? "") + "";
     }
 
-    if (streetInput) {
-        const autocomplete = new google.maps.places.Autocomplete(streetInput, {
-            fields: ["geometry", "formatted_address", "address_components"],
-        });
+    function parseCenter(wrapper, latInput, lngInput) {
+        const dLat = num(wrapper.dataset.lat);
+        const dLng = num(wrapper.dataset.lng);
 
-        autocomplete.addListener("place_changed", function () {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) return;
+        const iLat = num(latInput?.value);
+        const iLng = num(lngInput?.value);
 
-            const location = place.geometry.location;
+        if (dLat !== null && dLng !== null) return { lat: dLat, lng: dLng };
+        if (iLat !== null && iLng !== null) return { lat: iLat, lng: iLng };
 
-            map.setCenter(location);
-            marker.setPosition(location);
-            updateInputs(location);
+        // fallback VN
+        return { lat: 10.7769, lng: 106.7009 };
+    }
 
-            if (place.formatted_address) {
-                streetInput.value = place.formatted_address;
-                if (formattedInput)
-                    formattedInput.value = place.formatted_address;
+    function applyAddressComponents(place, els) {
+        if (!place?.address_components) return;
+
+        let streetNumber = "";
+        let route = "";
+
+        let countryName = "";
+        let countryCode = "";
+        let cityName = "";
+        let districtName = "";
+
+        for (const c of place.address_components) {
+            const types = c.types || [];
+
+            if (types.includes("street_number")) streetNumber = c.long_name;
+            if (types.includes("route")) route = c.long_name;
+
+            if (types.includes("country")) {
+                countryName = c.long_name;
+                countryCode = c.short_name;
             }
 
-            // Parse address_components
-            let countryName = "";
-            let countryCode = "";
-            let cityName = "";
-            let districtName = "";
+            // city hay gặp:
+            if (types.includes("administrative_area_level_1"))
+                cityName = c.long_name; // tỉnh/thành
+            if (!cityName && types.includes("locality")) cityName = c.long_name;
 
-            (place.address_components || []).forEach((component) => {
-                const types = component.types || [];
+            // district hay gặp:
+            if (types.includes("administrative_area_level_2"))
+                districtName = c.long_name;
+            if (!districtName && types.includes("sublocality_level_1"))
+                districtName = c.long_name;
+        }
 
-                if (types.includes("country")) {
-                    countryName = component.long_name; // vd: "Vietnam"
-                    countryCode = component.short_name; // vd: "VN"
-                }
+        const street = [streetNumber, route].filter(Boolean).join(" ").trim();
 
-                // Tỉnh/TP trực thuộc TW
-                if (types.includes("administrative_area_level_1")) {
-                    cityName = component.long_name;
-                }
+        setVal(els.streetInput, street || els.streetInput?.value);
+        setVal(
+            els.formattedInput,
+            place.formatted_address || els.formattedInput?.value
+        );
 
-                // Quận/Huyện (VN thường là level_2, nhưng đôi khi rơi vào sublocality/locality)
-                if (types.includes("administrative_area_level_2")) {
-                    districtName = component.long_name;
-                }
-
-                if (!districtName && types.includes("sublocality_level_1")) {
-                    districtName = component.long_name;
-                }
-            });
-
-            // ✅ đổ hidden name/code để backend map nếu dropdown fail
-            if (countryNameInput) countryNameInput.value = countryName;
-            if (countryCodeInput) countryCodeInput.value = countryCode;
-            if (cityNameInput) cityNameInput.value = cityName;
-            if (districtNameInput) districtNameInput.value = districtName;
-
-            // Special-case nhỏ: VN hay lệch “Vietnam” vs “Việt Nam”
-            // (giữ nguyên vẫn OK vì normalizeText đã bỏ dấu; nhưng để chắc hơn)
-            const countryNameForSelect =
-                normalizeText(countryName) === "vietnam"
-                    ? "Viet Nam"
-                    : countryName;
-
-            selectByText(countrySelect, countryNameForSelect);
-            selectByText(citySelect, cityName);
-            selectByText(districtSelect, districtName);
-        });
+        // optional hidden fields (nếu bạn đang dùng)
+        setVal(els.countryNameInput, countryName);
+        setVal(els.countryCodeInput, countryCode);
+        setVal(els.cityNameInput, cityName);
+        setVal(els.districtNameInput, districtName);
     }
-};
+
+    function initOne(wrapper) {
+        const canvas = qs(wrapper.dataset.canvas || ".rm-map-canvas", wrapper);
+        if (!canvas) return;
+
+        const mode = (wrapper.dataset.mode || "edit").toLowerCase(); // edit | show
+
+        const latInput = qs(wrapper.dataset.latInput);
+        const lngInput = qs(wrapper.dataset.lngInput);
+
+        const center = parseCenter(wrapper, latInput, lngInput);
+        const zoom =
+            num(wrapper.dataset.zoom) ??
+            (num(center.lat) && num(center.lng) ? 14 : 6);
+
+        const map = new google.maps.Map(canvas, {
+            center,
+            zoom,
+            mapTypeControl: false,
+            streetViewControl: false,
+            fullscreenControl: true,
+        });
+
+        const marker = new google.maps.Marker({
+            position: center,
+            map,
+            draggable: mode === "edit",
+        });
+
+        // sync input lần đầu (nếu có)
+        if (mode === "edit") {
+            setVal(latInput, center.lat);
+            setVal(lngInput, center.lng);
+        }
+
+        function setPos(lat, lng) {
+            marker.setPosition({ lat, lng });
+            map.panTo({ lat, lng });
+            if (mode === "edit") {
+                setVal(latInput, lat);
+                setVal(lngInput, lng);
+            }
+        }
+
+        if (mode === "edit") {
+            map.addListener("click", (e) =>
+                setPos(e.latLng.lat(), e.latLng.lng())
+            );
+            marker.addListener("dragend", () => {
+                const p = marker.getPosition();
+                if (!p) return;
+                setPos(p.lat(), p.lng());
+            });
+        }
+
+        // Optional: Autocomplete
+        const acInput = qs(wrapper.dataset.autocompleteInput);
+        if (acInput && google.maps.places?.Autocomplete) {
+            const ac = new google.maps.places.Autocomplete(acInput, {
+                fields: ["geometry", "formatted_address", "address_components"],
+            });
+            ac.bindTo("bounds", map);
+
+            const els = {
+                streetInput: qs(wrapper.dataset.streetInput),
+                formattedInput: qs(wrapper.dataset.formattedInput),
+
+                // hidden optional
+                countryNameInput: qs(wrapper.dataset.countryNameInput),
+                countryCodeInput: qs(wrapper.dataset.countryCodeInput),
+                cityNameInput: qs(wrapper.dataset.cityNameInput),
+                districtNameInput: qs(wrapper.dataset.districtNameInput),
+            };
+
+            ac.addListener("place_changed", () => {
+                const place = ac.getPlace();
+                if (!place?.geometry?.location) return;
+
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+
+                setPos(lat, lng);
+                applyAddressComponents(place, els);
+            });
+            if (els.streetInput && place.formatted_address) {
+                els.streetInput.value = place.formatted_address;
+            }
+        }
+    }
+
+    // callback cho Google Maps script
+    window.initRoomMap = function () {
+        document.querySelectorAll("[data-room-map]").forEach(initOne);
+    };
+})();

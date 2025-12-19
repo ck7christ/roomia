@@ -7,7 +7,7 @@
             <div class="card-header bg-white fw-semibold">Tạo Voucher</div>
             <div class="card-body">
                 <form method="POST" action="{{ route('admin.vouchers.store') }}">
-                    @include('partials.admin.vouchers.form')
+                    @include('partials.admin.vouchers.form', ['voucher' => $voucher])
                 </form>
             </div>
         </div>

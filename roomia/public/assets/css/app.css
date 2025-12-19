@@ -232,9 +232,11 @@ img {
 }
 
 /* ========== ROOM / IMAGE ========== */
-.room-map {
+.rm-map-canvas {
     width: 100%;
-    height: 200px;
+    height: 320px;
+    border-radius: 12px;
+    background: var(--rm-surface);
 }
 
 .room-thumb-wrapper {

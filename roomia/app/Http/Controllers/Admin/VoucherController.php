@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Voucher;
+use Illuminate\Validation\Rule;
 
 class VoucherController extends Controller
 {
@@ -14,15 +15,27 @@ class VoucherController extends Controller
     public function index(Request $request)
     {
         //
-        $q = $request->query('q');
+        $q = Voucher::query();
 
-        $vouchers = Voucher::query()
-            ->when($q, fn($qr) => $qr->where('code', 'like', "%{$q}%")->orWhere('name', 'like', "%{$q}%"))
-            ->latest()
-            ->paginate(12)
-            ->withQueryString();
+        if ($request->filled('q')) {
+            $kw = trim($request->q);
+            $q->where(function ($x) use ($kw) {
+                $x->where('code', 'like', "%{$kw}%")
+                    ->orWhere('name', 'like', "%{$kw}%");
+            });
+        }
 
-        return view('admin.vouchers.index', compact('vouchers', 'q'));
+        if ($request->filled('type')) {
+            $q->where('type', $request->type);
+        }
+
+        if ($request->filled('is_active')) {
+            $q->where('is_active', (bool) $request->is_active);
+        }
+
+        $vouchers = $q->latest()->paginate(20)->withQueryString();
+
+        return view('admin.vouchers.index', compact('vouchers'));
     }
 
     /**
@@ -31,10 +44,7 @@ class VoucherController extends Controller
     public function create()
     {
         //
-        return view('admin.vouchers.create', [
-            'voucher' => new Voucher(),
-            'types' => Voucher::TYPES,
-        ]);
+        return view('admin.vouchers.create');
     }
 
     /**
@@ -43,7 +53,15 @@ class VoucherController extends Controller
     public function store(Request $request)
     {
         //
-        $data = $this->validateVoucher($request);
+        $data = $this->validateData($request);
+
+        $data['code'] = strtoupper(trim($data['code']));
+        $data['is_active'] = $request->boolean('is_active');
+
+        // rule logic theo type
+        if ($data['type'] === 'fixed') {
+            $data['max_discount'] = null;
+        }
 
         Voucher::create($data);
 
@@ -67,10 +85,7 @@ class VoucherController extends Controller
     public function edit(Voucher $voucher)
     {
         //
-        return view('admin.vouchers.edit', [
-            'voucher' => $voucher,
-            'types' => Voucher::TYPES,
-        ]);
+        return view('admin.vouchers.edit', compact('voucher'));
     }
 
     /**
@@ -79,7 +94,15 @@ class VoucherController extends Controller
     public function update(Request $request, Voucher $voucher)
     {
         //
-        $data = $this->validateVoucher($request, $voucher->id);
+        $data = $this->validateData($request, $voucher);
+
+        $data['code'] = strtoupper(trim($data['code']));
+        $data['is_active'] = $request->boolean('is_active');
+
+        if ($data['type'] === 'fixed') {
+            $data['max_discount'] = null;
+        }
+
         $voucher->update($data);
 
         return redirect()->route('admin.vouchers.index')->with('success', 'Cập nhật voucher thành công.');
@@ -92,19 +115,34 @@ class VoucherController extends Controller
     {
         //
         $voucher->delete();
-        return back()->with('success', 'Đã xóa voucher.');
+        return redirect()->route('admin.vouchers.index')->with('success', 'Xoá voucher thành công.');
     }
-    private function validateVoucher(Request $request, ?int $ignoreId = null): array
+    private function validateData(Request $request, ?Voucher $voucher = null): array
     {
-        $unique = 'unique:vouchers,code' . ($ignoreId ? ",{$ignoreId}" : '');
+        $id = $voucher?->id;
 
         return $request->validate([
-            'code' => ['required', 'string', 'max:50', $unique],
-            'name' => ['nullable', 'string', 'max:120'],
-            'description' => ['nullable', 'string', 'max:5000'],
+            'name' => ['required', 'string', 'max:255'],
 
-            'type' => ['required', 'in:' . implode(',', Voucher::TYPES)],
-            'value' => ['required', 'numeric', 'min:0'],
+            'code' => [
+                'required',
+                'string',
+                'max:50',
+                'regex:/^[A-Za-z0-9_-]+$/',
+                Rule::unique('vouchers', 'code')->ignore($id),
+            ],
+
+            'type' => ['required', Rule::in(Voucher::TYPES)],
+            'value' => [
+                'required',
+                'numeric',
+                'gt:0',
+                function ($attr, $val, $fail) use ($request) {
+                    if ($request->input('type') === 'percent' && $val > 100) {
+                        $fail('Giá trị % không được vượt quá 100.');
+                    }
+                },
+            ],
 
             'min_subtotal' => ['nullable', 'numeric', 'min:0'],
             'max_discount' => ['nullable', 'numeric', 'min:0'],
@@ -112,7 +150,9 @@ class VoucherController extends Controller
             'usage_limit' => ['nullable', 'integer', 'min:1'],
             'per_user_limit' => ['nullable', 'integer', 'min:1'],
 
+            // checkbox: vẫn validate được nếu bạn dùng boolean() ở store/update
             'is_active' => ['nullable', 'boolean'],
+
             'starts_at' => ['nullable', 'date'],
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
         ], [], [

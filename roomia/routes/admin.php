@@ -53,9 +53,13 @@ Route::middleware(['auth', 'role:admin'])
             CRUD quản trị
             Các module admin quản lý toàn hệ thống.
          */
-        Route::resource('users', UserController::class);
-        Route::resource('rooms', RoomController::class);
-        Route::resource('bookings', BookingController::class);
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::resource('rooms', RoomController::class)
+            ->only(['index', 'show', 'edit', 'update', 'destroy']);
+        Route::resource('bookings', BookingController::class)
+            ->only(['index', 'show', 'update', 'destroy']);
+        Route::put('bookings/{booking}/cancel', [BookingController::class, 'cancel'])
+            ->name('bookings.cancel');
         Route::resource('hosts', HostController::class);
         Route::resource('payments', PaymentController::class);
         Route::resource('vouchers', VoucherController::class);

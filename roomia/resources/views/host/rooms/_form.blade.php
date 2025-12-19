@@ -128,28 +128,36 @@
                     {{-- Địa chỉ chi tiết (autocomplete) --}}
                     <div class="col-12">
                         <div class="mb-3">
-                            <label for="street" class="form-label">Địa chỉ chi tiết</label>
-                            <input type="text" id="street" name="street"
-                                class="form-control @error('street') is-invalid @enderror"
-                                value="{{ old('street', $addr->street ?? '') }}">
-                            @error('street')
+                            <label for="formatted_address" class="form-label">Địa chỉ đầy đủ</label>
+                            <input type="text" id="formatted_address" name="formatted_address"
+                                class="form-control @error('formatted_address') is-invalid @enderror"
+                                value="{{ old('formatted_address', $addr->formatted_address ?? '') }}"
+                                placeholder="Nhập địa điểm để gợi ý..." autocomplete="off" />
+
+                            @error('formatted_address')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
-
                     {{-- Bản đồ --}}
                     <div class="col-12">
                         <div class="mb-0">
                             <label class="form-label">Bản đồ</label>
-                            <div id="room-map" class="room-map border rounded"
-                                data-lat="{{ old('lat', $addr->lat ?? '') }}"
-                                data-lng="{{ old('lng', $addr->lng ?? '') }}"></div>
+
+                            <div data-room-map data-mode="edit" data-lat="{{ old('lat', $addr->lat ?? '') }}"
+                                data-lng="{{ old('lng', $addr->lng ?? '') }}" data-lat-input="#lat"
+                                data-lng-input="#lng" data-autocomplete-input="#formatted_address"
+                                data-formatted-input="#formatted_address" data-street-input="#street">
+                                {{-- giữ class room-map nếu bạn đang có CSS cũ --}}
+                                <div class="rm-map-canvas room-map border rounded"></div>
+                            </div>
+
                             <div class="form-text">
-                                Chọn địa chỉ hoặc kéo marker để cập nhật vị trí.
+                                Gõ địa chỉ ở ô “Địa chỉ đầy đủ” để chọn gợi ý, hoặc click/kéo marker để cập nhật vị trí.
                             </div>
                         </div>
                     </div>
+
                 </div>
 
                 {{-- hidden address fields --}}
