@@ -16,7 +16,7 @@
                             <div class="small mt-1"><strong>{{ optional($b->check_in)->format('d/m/Y') }}</strong> —
                                 {{ optional($b->guest)->name ?? '—' }}</div>
                         </div>
-                        <div>@include('partials.host.dashboard.status-badge', ['status' => $b->status])</div>
+                        <div>@include('partials.general.status-badge', ['status' => $b->status])</div>
                     </div>
                 </div>
             @empty
@@ -36,7 +36,7 @@
                             <div class="small mt-1"><strong>{{ optional($b->check_out)->format('d/m/Y') }}</strong> —
                                 {{ optional($b->guest)->name ?? '—' }}</div>
                         </div>
-                        <div>@include('partials.host.dashboard.status-badge', ['status' => $b->status])</div>
+                        <div>@include('partials.general.status-badge', ['status' => $b->status])</div>
                     </div>
                 </div>
             @empty

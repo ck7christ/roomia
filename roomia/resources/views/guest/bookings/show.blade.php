@@ -30,7 +30,7 @@
             <div>
                 <h1 class="h4 mb-1">Chi tiết đặt phòng #{{ $booking->id }}</h1>
                 <div class="text-muted small">
-                    @include('partials.guest.bookings.status-badge', ['status' => $booking->status])
+                    @include('partials.general.status-badge', ['status' => $booking->status])
                 </div>
             </div>
 
@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        @includeIf('partials.general.alerts')
+        @include('partials.general.alerts')
 
         <div class="row g-3">
             {{-- Thông tin chỗ ở --}}

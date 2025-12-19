@@ -1,8 +1,8 @@
+{{-- resources/views/guest/home.blade.php --}}
 @extends('layouts.guest')
-
+@section('title', 'Trang Chủ')
 @section('content')
     <div class="container py-3">
-
         @include('partials.guest.home.hero')
         @include('partials.guest.home.search')
         @include('partials.guest.home.recent-searches')
@@ -21,8 +21,6 @@
             'roomRatings' => $roomRatings ?? [],
             'wishlistRoomIds' => $wishlistRoomIds ?? [],
         ])
-
         @include('partials.guest.home.explore-vietnam')
-
     </div>
 @endsection

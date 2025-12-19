@@ -55,12 +55,14 @@ class BookingController extends Controller
         $user = Auth::user();
 
         $data = $request->validate([
+            'room_type_id' => ['required', 'integer', 'exists:room_types,id'],
             'check_in' => ['required', 'date', 'after_or_equal:today'],
             'check_out' => ['required', 'date', 'after:check_in'],
             'guest_count' => ['required', 'integer', 'min:1'],
             'voucher_code' => ['nullable', 'string', 'max:50'],
         ]);
 
+        $roomType = RoomType::findOrFail($data['room_type_id']);
         $checkIn = Carbon::parse($data['check_in'])->startOfDay();
         $checkOut = Carbon::parse($data['check_out'])->startOfDay();
         $guestCount = (int) $data['guest_count'];
@@ -163,7 +165,7 @@ class BookingController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('guest.payments.create', $booking)
+                ->route('guest.bookings.payments.create', $booking)
                 ->with('success', 'Đặt phòng thành công! Vui lòng chọn phương thức thanh toán.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();

@@ -11,7 +11,7 @@
                 @foreach($counts as $status => $total)
                     <div class="col-12 col-md-6">
                         <div class="d-flex align-items-center justify-content-between border rounded p-2">
-                            <div>@include('partials.host.dashboard.status-badge', ['status' => $status])</div>
+                            <div>@include('partials.general.status-badge', ['status' => $status])</div>
                             <div class="fw-semibold">{{ $total }}</div>
                         </div>
                     </div>

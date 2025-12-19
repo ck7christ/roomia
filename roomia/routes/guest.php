@@ -84,13 +84,17 @@ Route::middleware(['auth', 'role:guest'])
         Route::post('bookings/{booking}/payments', [PaymentController::class, 'store'])
             ->name('bookings.payments.store');
 
-        // Form viết review cho 1 booking
-        Route::get('bookings/{booking}/review', [ReviewController::class, 'create'])
-            ->name('reviews.create');
-
-        // Lưu review
-        Route::post('bookings/{booking}/review', [ReviewController::class, 'store'])
-            ->name('reviews.store');
+        // REVIEW (singular: 1 booking = 1 review)
+        Route::get('/bookings/{booking}/review', [ReviewController::class, 'create'])
+            ->name('bookings.review.create');
+        Route::post('/bookings/{booking}/review', [ReviewController::class, 'store'])
+            ->name('bookings.review.store');
+        Route::get('/bookings/{booking}/review/edit', [ReviewController::class, 'edit'])
+            ->name('bookings.review.edit');
+        Route::patch('/bookings/{booking}/review', [ReviewController::class, 'update'])
+            ->name('bookings.review.update');
+        Route::delete('/bookings/{booking}/review', [ReviewController::class, 'destroy'])
+            ->name('bookings.review.destroy');
 
         Route::get('wishlist', [WishlistController::class, 'index'])
             ->name('wishlist.index');

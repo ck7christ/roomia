@@ -1,6 +1,31 @@
 <form method="POST" action="{{ $action }}" class="row g-2">
     @csrf
 
+    {{-- Hiện lỗi tổng để biết 302 redirect back vì validate fail --}}
+    @if ($errors->any())
+        <div class="col-12">
+            <div class="alert alert-danger small mb-0">
+                <div class="fw-semibold mb-1">Không thể tiếp tục:</div>
+                <ul class="mb-0 ps-3">
+                    @foreach ($errors->all() as $e)
+                        <li>{{ $e }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="col-12">
+            <div class="alert alert-warning small mb-0">{{ session('error') }}</div>
+        </div>
+    @endif
+
+    {{-- Chỉ để UI mở đúng collapse sau redirect back (controller không cần field này) --}}
+    @isset($roomTypeId)
+        <input type="hidden" name="room_type_id" value="{{ $roomTypeId }}">
+    @endisset
+
     <div class="col-12 col-md-4">
         <label class="form-label mb-1">Nhận phòng</label>
         <input type="date" name="check_in" value="{{ old('check_in') }}"

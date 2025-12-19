@@ -43,7 +43,7 @@
                         </td>
 
                         <td>
-                            @include('partials.host.dashboard.status-badge', ['status' => $b->status])
+                            @include('partials.general.status-badge', ['status' => $b->status])
                         </td>
 
                         <td class="text-end">

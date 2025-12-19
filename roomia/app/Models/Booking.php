@@ -58,9 +58,9 @@ class Booking extends Model
         return $this->belongsTo(User::class, 'guest_id');
     }
 
-    public function payments()
+    public function payment()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasOne(Payment::class, 'booking_id')->latestOfMany();
     }
 
     public function latestPayment()
