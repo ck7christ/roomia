@@ -15,6 +15,12 @@
             {{-- Nội dung chính Admin
             - col-md-9 / col-lg-10: phần nội dung chiếm diện tích còn lại --}}
             <div class="col-12 col-md-9 col-lg-10">
+                <div class="d-lg-none sticky-top bg-white border-bottom px-2 py-2">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
+                        data-bs-target="#adminSidebar" aria-controls="adminSidebar">
+                        <i class="fa-solid fa-bars " title="Menu"></i> 
+                    </button>
+                </div>
                 {{-- Nơi các view con (admin/dashboard, admin/users/index, ...) render nội dung --}}
                 @yield('content')
             </div>

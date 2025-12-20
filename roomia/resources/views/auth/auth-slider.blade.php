@@ -21,11 +21,11 @@
                         {{-- PANEL TRÁI --}}
                         <div
                             class="col-12 col-md-6 auth-side-panel d-flex flex-column justify-content-center align-items-start">
-                            <h2 class="fw-semibold mb-3">New here?</h2>
-                            <p class="mb-4 small">Enter your details and start your journey with us.</p>
+                            <h2 class="fw-semibold mb-3">Bạn chưa có tài khoản?</h2>
+                            <p class="mb-4 small">Nhập thông tin của bạn và bắt đầu hành trình cùng Roomia</p>
 
                             <button type="button" class="btn btn-outline-light px-5" data-auth-mode="signup">
-                                SIGN UP
+                                ĐĂNG KÝ
                             </button>
                         </div>
 
@@ -33,15 +33,15 @@
                         <div class="col-12 col-md-6">
                             <div class="auth-form-panel p-4 p-md-5 h-100 d-flex flex-column justify-content-center">
 
-                                <h3 class="fw-bold mb-1">Sign In</h3>
-                                <p class="small text-muted mb-4">Use your email and password to continue.</p>
+                                <h3 class="fw-bold mb-1">ĐĂNG NHẬP</h3>
+                                <p class="small text-muted mb-4">Dùng email và mật khẩu để tiếp tục.</p>
 
                                 <form method="POST" action="{{ route('login') }}">
                                     @csrf
 
                                     {{-- Email --}}
                                     <div class="mb-3">
-                                        <label class="form-label small text-muted" for="email">Email</label>
+                                        <label class="form-label small text-muted" for="email">EMAIL</label>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-envelope"></i>
@@ -57,7 +57,7 @@
 
                                     {{-- Password --}}
                                     <div class="mb-3">
-                                        <label class="form-label small text-muted" for="password">Password</label>
+                                        <label class="form-label small text-muted" for="password">MẬT KHẨU</label>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-lock"></i>
@@ -77,20 +77,20 @@
                                             <input class="form-check-input" type="checkbox" name="remember" id="remember"
                                                 @checked(old('remember'))>
                                             <label class="form-check-label small" for="remember">
-                                                Remember me
+                                                Ghi nhớ đăng nhập
                                             </label>
                                         </div>
 
                                         @if (Route::has('password.request'))
                                             <a href="{{ route('password.request') }}" class="small text-decoration-none">
-                                                Forgot password?
+                                                Quên mật khẩu?
                                             </a>
                                         @endif
                                     </div>
 
                                     <div class="text-center">
                                         <button type="submit" class="btn auth-primary-btn px-5">
-                                            SIGN IN
+                                            ĐĂNG NHẬP
                                         </button>
                                     </div>
                                 </form>
@@ -111,15 +111,15 @@
                         <div class="col-12 col-md-6">
                             <div class="auth-form-panel p-4 p-md-5 h-100 d-flex flex-column justify-content-center">
 
-                                <h3 class="fw-bold mb-1">Create Account</h3>
-                                <p class="small text-muted mb-4">Fill out the information below to register.</p>
+                                <h3 class="fw-bold mb-1">TẠO TÀI KHOẢN</h3>
+                                <p class="small text-muted mb-4">Vui lòng điền thông tin bên dưới để đăng ký.</p>
 
                                 <form method="POST" action="{{ route('register.store') }}">
                                     @csrf
 
                                     {{-- Name --}}
                                     <div class="mb-3">
-                                        <label for="name" class="form-label small text-muted">Name</label>
+                                        <label for="name" class="form-label small text-muted">HỌ VÀ TÊN</label>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-user"></i>
@@ -134,7 +134,7 @@
 
                                     {{-- Email --}}
                                     <div class="mb-3">
-                                        <label for="reg_email" class="form-label small text-muted">Email</label>
+                                        <label for="reg_email" class="form-label small text-muted">EMAIL</label>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-envelope"></i>
@@ -149,7 +149,7 @@
 
                                     {{-- Password --}}
                                     <div class="mb-3">
-                                        <label for="reg_password" class="form-label small text-muted">Password</label>
+                                        <label for="reg_password" class="form-label small text-muted">MẬT KHẨU</label>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-lock"></i>
@@ -165,19 +165,20 @@
                                     {{-- Confirm --}}
                                     <div class="mb-4">
                                         <label for="password_confirmation" class="form-label small text-muted">
-                                            Confirm Password
+                                            XÁC NHẬN MẬT KHẨU
                                         </label>
                                         <div class="input-group input-group-sm">
                                             <span class="input-group-text">
                                                 <i class="fa-solid fa-lock"></i>
                                             </span>
-                                            <input id="password_confirmation" type="password" name="password_confirmation"
-                                                class="form-control" required autocomplete="new-password">
+                                            <input id="password_confirmation" type="password"
+                                                name="password_confirmation" class="form-control" required
+                                                autocomplete="new-password">
                                         </div>
                                     </div>
                                     <div class="text-center">
                                         <button type="submit" class="btn auth-primary-btn px-5">
-                                            SIGN UP
+                                            ĐĂNG KÝ
                                         </button>
                                     </div>
                                 </form>
@@ -187,11 +188,11 @@
                         {{-- PANEL PHẢI --}}
                         <div
                             class="col-12 col-md-6 auth-side-panel d-flex flex-column justify-content-center align-items-start">
-                            <h2 class="fw-semibold mb-3">Welcome Back!</h2>
-                            <p class="mb-4 small">Already have an account? Sign in to continue.</p>
+                            <h2 class="fw-semibold mb-3">Chào mừng bạn quay lại!</h2>
+                            <p class="mb-4 small">Bạn đã có tài khoản? Đăng nhập để tiếp tục.</p>
 
                             <button type="button" class="btn btn-outline-light px-5" data-auth-mode="signin">
-                                SIGN IN
+                                ĐĂNG NHẬP
                             </button>
                         </div>
 

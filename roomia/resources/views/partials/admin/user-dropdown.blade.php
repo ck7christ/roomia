@@ -16,7 +16,7 @@
         {{-- Header --}}
         <li class="px-3 py-2">
             <div class="fw-semibold">
-                {{ Auth::user()->name ?? 'Host User' }}
+                {{ Auth::user()->name ?? 'Admin User' }}
             </div>
             <div class="text-muted small">
                 {{ Auth::user()->email ?? '' }}

@@ -9,6 +9,7 @@
 @endphp
 
 @extends($layout)
+@section('title', 'Hồ Sơ Cá Nhân')
 @php
     use Illuminate\Support\Facades\Route;
 

@@ -88,16 +88,17 @@
                             </td>
 
                             <td class="text-end">
-                                <a href="{{ route('admin.users.edit', $u) }}" class="btn btn-sm btn-outline-primary">
-                                    Sửa
+                                <a href="{{ route('admin.users.edit', $u) }}" class="btn btn-sm btn-outline-primary"
+                                    title="Sửa">
+                                    <i class="fa-regular fa-pen-to-square"></i>
                                 </a>
 
                                 <form action="{{ route('admin.users.destroy', $u) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit"
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" title="Xóa"
                                         @disabled(auth()->id() === $u->id)>
-                                        Xóa
+                                        <i class="fa-regular fa-trash-can"></i>
                                     </button>
                                 </form>
 

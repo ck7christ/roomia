@@ -566,6 +566,56 @@
         });
     }
 
+    function initVoucherGate(options = {}) {
+        const config = {
+            boxId: "voucherBox",
+            voucherInputId: "voucherCodeInput",
+            hintId: "voucherGateHint",
+            defaultPayButtonId: "btnCheckoutPay",
+        };
+
+        const box = document.getElementById(config.boxId);
+        if (!box) return null;
+
+        const payButtonId =
+            box.dataset.payButtonId || config.defaultPayButtonId;
+        const payBtn = document.getElementById(payButtonId);
+        if (!payBtn) return null;
+
+        const input = document.getElementById(config.voucherInputId);
+        const hint = document.getElementById(config.hintId);
+
+        const updateGate = () => {
+            const applied = box.dataset.voucherApplied === "1";
+
+            if (applied) {
+                payBtn.disabled = false;
+                if (hint) hint.classList.add("d-none");
+                return;
+            }
+
+            const hasCode = !!(input && input.value.trim().length > 0);
+            payBtn.disabled = hasCode;
+            if (hint) hint.classList.toggle("d-none", !hasCode);
+        };
+
+        const onInput = () => updateGate();
+
+        updateGate();
+        if (input) input.addEventListener("input", onInput);
+
+        return {
+            refresh: updateGate,
+            setApplied(isApplied) {
+                box.dataset.voucherApplied = isApplied ? "1" : "0";
+                updateGate();
+            },
+            destroy() {
+                if (input) input.removeEventListener("input", onInput);
+            },
+        };
+    }
+
     // ---------- Boot ----------
     document.addEventListener("DOMContentLoaded", () => {
         initAuthSlider();
@@ -577,5 +627,8 @@
         initRoomiaSliders();
         initExploreRotator();
         initRoomGalleryModalSync();
+        initVoucherGate({
+            defaultPayButtonId: "btnCheckoutPay",
+        });
     });
 })();

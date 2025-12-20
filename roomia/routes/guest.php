@@ -8,6 +8,7 @@ use App\Http\Controllers\Guest\WishlistController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Guest\ContactController;
 use App\Http\Controllers\Guest\VoucherApplyController;
+use App\Http\Controllers\Guest\VoucherController;
 /*
 |--------------------------------------------------------------------------
 | Guest - Public routes
@@ -18,7 +19,8 @@ use App\Http\Controllers\Guest\VoucherApplyController;
 | - apply voucher (thường dùng trước khi thanh toán)
 */
 // Contact: GET form + POST gửi (có throttle chống spam)
-Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
+Route::get('/contact', [ContactController::class, 'show'])
+    ->name('contact.show');
 Route::post('/contact', [ContactController::class, 'send'])
     ->name('contact.send')
     ->middleware('throttle:10,1');
@@ -28,9 +30,10 @@ Route::get('/rooms', [RoomController::class, 'index'])
 // Chi tiết 1 phòng (Route Model Binding: {room})
 Route::get('/rooms/{room}', [RoomController::class, 'show'])
     ->name('rooms.show');
-// Guest apply/remove (dùng trong booking form)
-Route::post('/vouchers/apply', [VoucherApplyController::class, 'apply'])->name('vouchers.apply');
-Route::post('/vouchers/remove', [VoucherApplyController::class, 'remove'])->name('vouchers.remove');
+Route::get('/vouchers', [VoucherController::class, 'index'])
+    ->name('vouchers.index');
+
+
 /*
 |--------------------------------------------------------------------------
 | Guest - Authenticated routes
@@ -108,4 +111,9 @@ Route::middleware(['auth', 'role:guest'])
             ->name('wishlist.store');
         Route::delete('wishlist/{room}', [WishlistController::class, 'destroy'])
             ->name('wishlist.destroy');
+        // Guest apply/remove (dùng trong booking form)
+        Route::post('/vouchers/apply', [VoucherApplyController::class, 'apply'])
+            ->name('vouchers.apply');
+        Route::post('/vouchers/remove', [VoucherApplyController::class, 'remove'])
+            ->name('vouchers.remove');
     });

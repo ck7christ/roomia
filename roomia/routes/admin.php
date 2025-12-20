@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\BookingController;
-use App\Http\Controllers\Admin\HostController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ReportController;
@@ -60,7 +59,6 @@ Route::middleware(['auth', 'role:admin'])
             ->only(['index', 'show', 'update', 'destroy']);
         Route::put('bookings/{booking}/cancel', [BookingController::class, 'cancel'])
             ->name('bookings.cancel');
-        Route::resource('hosts', HostController::class);
         Route::resource('payments', PaymentController::class);
         Route::resource('vouchers', VoucherController::class);
         // Reports (ví dụ trang thống kê tổng hợp)

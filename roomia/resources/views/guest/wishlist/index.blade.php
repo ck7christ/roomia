@@ -110,8 +110,7 @@
                                                 @if ($room && $hasRoomShow)
                                                     <a href="{{ route('guest.rooms.show', $room) }}"
                                                         class="btn btn-sm btn-outline-secondary">
-                                                        <i class="fa-regular fa-eye me-1"></i>
-                                                        Xem
+                                                        <i class="fa-regular fa-eye" title="Xem"></i>
                                                     </a>
                                                 @endif
 
@@ -123,8 +122,7 @@
                                                         @method('DELETE')
 
                                                         <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                            <i class="fa-solid fa-trash me-1"></i>
-                                                            Xoá
+                                                            <i class="fa-solid fa-trash" title="Xóa"></i>
                                                         </button>
                                                     </form>
                                                 @endif

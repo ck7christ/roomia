@@ -1,10 +1,10 @@
 @extends('layouts.admin')
-@section('title', 'Quản lý Booking')
+@section('title', 'Quản Lý Đặt Phòng')
 
 @section('content')
     <div class="py-4 px-3">
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <h4 class="mb-0">Bookings</h4>
+            <h4 class="mb-0">Quản Lý Đặt Phòng</h4>
         </div>
 
         {{-- Filter --}}
@@ -64,7 +64,7 @@
                                 <th>Ngày</th>
                                 <th class="text-end">Tổng</th>
                                 <th class="text-center">Trạng thái</th>
-                                <th style="width: 120px;"></th>
+                                <th class="text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -115,8 +115,7 @@
 
                                     <td class="text-end">
                                         <a href="{{ route('admin.bookings.show', $b) }}" class="btn btn-sm btn-outline-primary">
-                                            Xem
-                                        </a>
+                                            <i class="fa-solid fa-eye" title="Xem"></i> </a>
                                     </td>
                                 </tr>
                             @empty
