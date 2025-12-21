@@ -1,10 +1,7 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 class Booking extends Model
 {
     // Status constants
@@ -21,26 +18,23 @@ class Booking extends Model
         'check_out',
         'total_price',
         'status',
-
+        // hủy đặt phòng
         'cancelled_at',
         'cancelled_by_id',
         'cancelled_by_type',
         'cancel_reason',
-
+        // mã giảm giá
         'voucher_id',
         'voucher_code',
         'voucher_discount_amount',
         'voucher_snapshot',
     ];
-
     protected $casts = [
         'check_in' => 'datetime',
         'check_out' => 'datetime',
         'guest_count' => 'integer',
         'total_price' => 'decimal:2',
-
         'cancelled_at' => 'datetime',
-
         'voucher_discount_amount' => 'decimal:2',
         'voucher_snapshot' => 'array',
     ];
@@ -52,17 +46,14 @@ class Booking extends Model
     {
         return $this->belongsTo(RoomType::class, 'room_type_id');
     }
-
     public function guest()
     {
         return $this->belongsTo(User::class, 'guest_id');
     }
-
     public function payment()
     {
         return $this->hasOne(Payment::class, 'booking_id')->latestOfMany();
     }
-
     public function latestPayment()
     {
         return $this->hasOne(Payment::class)->latestOfMany();
@@ -78,19 +69,16 @@ class Booking extends Model
         ) {
             return false;
         }
-
         // Không cho hủy nếu ngày check-in đã qua
         if (optional($this->check_in)->isPast()) {
             return false;
         }
-
         // Tùy rule của bạn, tạm cho phép hủy khi đang pending hoặc confirmed
         return in_array($this->status, [
             self::STATUS_PENDING,
             self::STATUS_CONFIRMED,
         ]);
     }
-
     public function review()
     {
         return $this->hasOne(Review::class);
@@ -99,6 +87,4 @@ class Booking extends Model
     {
         return $this->belongsTo(\App\Models\Voucher::class);
     }
-
-
 }

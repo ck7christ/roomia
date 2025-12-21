@@ -82,13 +82,13 @@ class VoucherApplyController extends Controller
 
         return back()->with('success', 'Đã gỡ voucher.');
     }
-
+    // Tính trước voucher được giảm
     private function calculatePreviewDiscount(Voucher $voucher, float $subtotal): float
     {
         if ($subtotal <= 0)
             return 0.0;
 
-        $type = (string) $voucher->type;   // percent|fixed
+        $type = (string) $voucher->type;
         $value = (float) $voucher->value;
 
         $discount = 0.0;

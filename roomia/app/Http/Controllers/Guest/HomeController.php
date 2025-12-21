@@ -43,7 +43,7 @@ class HomeController extends Controller
             ->unique(fn($x) => $x['signature'] ?: md5(json_encode($x)))
             ->values()
             ->take(6);
-        // Featured rooms (demo DB)
+        // Featured rooms 
         $featuredRooms = Room::with([
             'images' => function ($q) {
                 $q->orderBy('id');
@@ -65,7 +65,7 @@ class HomeController extends Controller
             )
             ->groupBy('rooms.id');
 
-        //  Collections: ưu tiên phòng rating cao (không trùng featured)
+        //  Collections: ưu tiên phòng rating cao 
         $collectionRooms = Room::with(['images' => fn($q) => $q->orderBy('id')])
             ->where('rooms.status', 'active')
             ->leftJoinSub($ratingSub, 'rr', fn($join) => $join->on('rooms.id', '=', 'rr.room_id'))

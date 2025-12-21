@@ -31,8 +31,8 @@ class VoucherController extends Controller
             $kw = trim($request->q);
             $q->where(function ($x) use ($kw) {
                 $x->where('code', 'like', "%{$kw}%")
-                  ->orWhere('name', 'like', "%{$kw}%")
-                  ->orWhere('description', 'like', "%{$kw}%");
+                    ->orWhere('name', 'like', "%{$kw}%")
+                    ->orWhere('description', 'like', "%{$kw}%");
             });
         }
 
