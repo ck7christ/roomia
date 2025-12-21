@@ -4,8 +4,8 @@
 <div class="row g-3 mb-4">
     @foreach(($deals ?? []) as $d)
         <div class="col-12 col-lg-6">
-            <div class="card text-bg-dark">
-                <img src="{{ asset($d['image']) }}" class="card-img" alt="deal">
+            <div class="card rm-card ratio ratio-4x3 text-bg-dark">
+                <img src="{{ asset($d['image']) }}" class="card-img " alt="deal">
                 <div class="card-img-overlay d-flex flex-column justify-content-end">
                     <div class="badge text-bg-light text-dark mb-2 align-self-start">{{ $d['badge'] }}</div>
                     <h5 class="card-title fw-bold mb-1">{{ $d['title'] }}</h5>

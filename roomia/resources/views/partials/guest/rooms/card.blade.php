@@ -7,7 +7,7 @@
     $amenities = $room->amenities ?? collect();
 @endphp
 
-<div class="card h-100 shadow-sm">
+<div class="card rm-card h-100 shadow-sm">
     <a href="{{ route('guest.rooms.show', $room) }}" class="text-decoration-none">
         <div class="room-thumb-wrapper position-relative">
             @if ($cover)

@@ -12,6 +12,15 @@
     $streetInput = $streetInput ?? null;
     $formattedInput = $formattedInput ?? null;
 
+    // optional: dùng để resolve id từ tên (controller của bạn có xử lý)
+    $countryNameInput = $countryNameInput ?? null;
+    $countryCodeInput = $countryCodeInput ?? null;
+    $cityNameInput = $cityNameInput ?? null;
+    $districtNameInput = $districtNameInput ?? null;
+
+    // optional: class chiều cao (nếu bạn đã có CSS), vẫn giữ fallback inline height
+    $heightClass = $heightClass ?? null;
+
     $mapId = $mapId ?? 'rm-map-' . uniqid();
 @endphp
 
@@ -20,6 +29,10 @@
     @if ($lngInput) data-lng-input="{{ $lngInput }}" @endif
     @if ($autocompleteInput) data-autocomplete-input="{{ $autocompleteInput }}" @endif
     @if ($streetInput) data-street-input="{{ $streetInput }}" @endif
-    @if ($formattedInput) data-formatted-input="{{ $formattedInput }}" @endif>
-    <div class="rm-map-canvas border rounded" style="height: {{ (int) $height }}px;"></div>
+    @if ($formattedInput) data-formatted-input="{{ $formattedInput }}" @endif
+    @if ($countryNameInput) data-country-name-input="{{ $countryNameInput }}" @endif
+    @if ($countryCodeInput) data-country-code-input="{{ $countryCodeInput }}" @endif
+    @if ($cityNameInput) data-city-name-input="{{ $cityNameInput }}" @endif
+    @if ($districtNameInput) data-district-name-input="{{ $districtNameInput }}" @endif>
+    <div class="rm-map-canvas border rounded {{ $heightClass }}" style="height: {{ (int) $height }}px;"></div>
 </div>

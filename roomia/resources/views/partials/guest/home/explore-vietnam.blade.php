@@ -34,7 +34,7 @@
                 <div class="explore__panel">
                     <div class="explore__kicker">
                         <span class="explore__badge">
-                            <i class="fa-solid fa-compass me-2"></i> EXPLORE VIỆT NAM
+                            <i class="fa-solid fa-compass me-2"></i> KHÁM PHÁ VIỆT NAM
                         </span>
                         <span class="explore__spark" aria-hidden="true"></span>
                     </div>

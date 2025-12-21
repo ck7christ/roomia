@@ -52,7 +52,7 @@
             $hasRoomShow = \Illuminate\Support\Facades\Route::has('guest.rooms.show');
         @endphp
 
-        <div class="card">
+        <div class="card rm-card">
             <div class="card-header bg-white">
                 <div class="fw-semibold">
                     <i class="fa-regular fa-heart me-1"></i>
@@ -68,7 +68,7 @@
                     </div>
                 @else
                     <div class="table-responsive">
-                        <table class="table align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th>Chỗ Ở</th>

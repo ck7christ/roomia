@@ -29,7 +29,16 @@
     }
 
     function applyAddressComponents(place, els) {
-        if (!place?.address_components) return;
+        const formatted = place?.formatted_address || place?.name || "";
+
+        // luôn set formatted trước (kể cả thiếu address_components)
+        if (formatted) setVal(els.formattedInput, formatted);
+
+        // nếu thiếu components thì fallback street = formatted
+        if (!place?.address_components) {
+            if (formatted) setVal(els.streetInput, formatted);
+            return;
+        }
 
         let streetNumber = "";
         let route = "";
@@ -50,12 +59,12 @@
                 countryCode = c.short_name;
             }
 
-            // city hay gặp:
+            // City/Province (VN hay nằm ở level_1)
             if (types.includes("administrative_area_level_1"))
                 cityName = c.long_name; // tỉnh/thành
             if (!cityName && types.includes("locality")) cityName = c.long_name;
 
-            // district hay gặp:
+            // District (VN hay nằm ở level_2)
             if (types.includes("administrative_area_level_2"))
                 districtName = c.long_name;
             if (!districtName && types.includes("sublocality_level_1"))
@@ -64,13 +73,10 @@
 
         const street = [streetNumber, route].filter(Boolean).join(" ").trim();
 
-        setVal(els.streetInput, street || els.streetInput?.value);
-        setVal(
-            els.formattedInput,
-            place.formatted_address || els.formattedInput?.value
-        );
+        // street ưu tiên streetNumber+route, fallback formatted
+        setVal(els.streetInput, street || formatted || els.streetInput?.value);
 
-        // optional hidden fields (nếu bạn đang dùng)
+        // optional hidden fields (nếu bạn đang dùng để resolve ID)
         setVal(els.countryNameInput, countryName);
         setVal(els.countryCodeInput, countryCode);
         setVal(els.cityNameInput, cityName);
@@ -87,9 +93,10 @@
         const lngInput = qs(wrapper.dataset.lngInput);
 
         const center = parseCenter(wrapper, latInput, lngInput);
-        const zoom =
-            num(wrapper.dataset.zoom) ??
-            (num(center.lat) && num(center.lng) ? 14 : 6);
+        const hasCenter =
+            Number.isFinite(center.lat) && Number.isFinite(center.lng);
+
+        const zoom = num(wrapper.dataset.zoom) ?? (hasCenter ? 14 : 6);
 
         const map = new google.maps.Map(canvas, {
             center,
@@ -135,7 +142,12 @@
         const acInput = qs(wrapper.dataset.autocompleteInput);
         if (acInput && google.maps.places?.Autocomplete) {
             const ac = new google.maps.places.Autocomplete(acInput, {
-                fields: ["geometry", "formatted_address", "address_components"],
+                fields: [
+                    "geometry",
+                    "formatted_address",
+                    "name",
+                    "address_components",
+                ],
             });
             ac.bindTo("bounds", map);
 
@@ -160,11 +172,18 @@
                 setPos(lat, lng);
                 applyAddressComponents(place, els);
             });
-            if (els.streetInput && place.formatted_address) {
-                els.streetInput.value = place.formatted_address;
-            }
         }
     }
+
+    function escapeHtml(s) {
+        return (s || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     function initRoomsListMap() {
         document.querySelectorAll("[data-rooms-list-map]").forEach((wrap) => {
             const canvas = wrap.querySelector(".rm-map-canvas");
@@ -199,10 +218,11 @@
                 bounds.extend(pos);
 
                 marker.addListener("click", () => {
-                    const title = (r.title || "").replace(/</g, "&lt;");
+                    const title = escapeHtml(r.title || "");
+                    const url = r.url || "#";
+
                     info.setContent(
-                        `<div style="font-weight:600;margin-bottom:4px;">${title}</div>
-           <a href="${r.url}">Xem chi tiết</a>`
+                        `<div><strong>${title}</strong></div><div><a href="${url}">Xem chi tiết</a></div>`
                     );
                     info.open({ map, anchor: marker });
                 });

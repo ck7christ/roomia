@@ -65,8 +65,8 @@
                         $activeTypes = $roomTypes->where('status', 'active')->count();
                         $amenities = $room->amenities ?? collect();
                     @endphp
-
-                    <div class="col-12 col-lg-6">
+                    {{-- Danh sách phòng --}}
+                    <div class="col-12 col-lg-4">
                         <div class="card rm-card-soft rm-room-card h-100">
                             {{-- Cover --}}
                             <a href="{{ route('guest.rooms.show', $room) }}" class="rm-room-cover">
@@ -91,7 +91,7 @@
                                     @endif
                                 </div>
                                 <div>
-                                    
+
                                 </div>
                             </a>
 

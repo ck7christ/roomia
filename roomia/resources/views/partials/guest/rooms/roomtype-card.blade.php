@@ -5,7 +5,7 @@
     $collapseId = 'bookFormRt' . ($rt->id ?? 'x');
     $shouldShow = (string) old('room_type_id') === (string) ($rt->id ?? '');
 @endphp
-<div class="card border">
+<div class="card rm-card border">
     <div class="card-body">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
             <div>

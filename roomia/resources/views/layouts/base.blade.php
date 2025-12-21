@@ -72,10 +72,11 @@
     <script src="{{ asset('assets/js/app.js') }}"></script>
     {{-- (13) Cho phép từng view “push” thêm JS nếu cần --}}
     @stack('scripts')
-    <script src="{{ asset('assets/js/room-map.js') }}?v={{ filemtime(public_path('assets/js/room-map.js')) }}"
+    <script src="{{ asset('assets/js/room-map.js') }}"
         defer></script>
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key') }}&libraries=places&callback=initRoomMap"
         defer></script>
 </body>
+
 </html>

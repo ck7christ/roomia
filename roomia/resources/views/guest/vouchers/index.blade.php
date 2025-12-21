@@ -33,7 +33,7 @@
             @endphp
 
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="card h-100">
+                <div class="card rm-card rm-animate rm-delay-1 h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between gap-2">
                             <div>

@@ -1,8 +1,26 @@
 /* =========================================================
-   ROOMIA – APP CSS 
+   ROOMIA – APP CSS (UPDATED + COMMENTED)
+   ---------------------------------------------------------
+   File CSS dùng chung toàn dự án Roomia, dùng để:
+   - Định nghĩa theme (màu brand, shadow, radius, motion)
+   - Override Bootstrap (buttons, form focus, navbar)
+   - Thêm hiệu ứng UI (hover lift, ripple, fade-up, shimmer)
+   - Style các module: Room, Map, Auth, Home sections, Snow...
+   Gợi ý dùng trong Blade:
+   - Card hover đẹp: class="card rm-card"
+   - Animate khi load: thêm class rm-animate
+   Lưu ý: Snow effect cần JS tạo .snowflake (CSS chỉ là style)
+
+   - Clean + consistent effects (hover, focus, reveal)
+   - Fix invalid rgba(var(--rm-primary)) by adding RGB vars
+   - Avoid global img aspect-ratio (too risky)
    ========================================================= */
 
-/* ========== ROOT VARIABLES ========== */
+/* =========================================================
+   1) ROOT VARIABLES (Biến dùng chung)
+   - Tập trung màu sắc/spacing/animation để đồng bộ toàn site
+   - Dùng --rm-*-rgb để pha alpha với rgba()
+   ========================================================= */
 :root {
     /* Brand colors */
     --rm-primary: #003b95;
@@ -10,6 +28,11 @@
     --rm-primary-focus: #0052cc;
     --rm-primary-active: #002f73;
     --rm-accent: #f6a100;
+
+    /* RGB helpers (for rgba())
+       - Dùng khi cần rgba(var(--rm-primary-rgb), alpha) */
+    --rm-primary-rgb: 0, 59, 149;
+    --rm-accent-rgb: 246, 161, 0;
 
     /* Neutral */
     --rm-white: #ffffff;
@@ -22,8 +45,14 @@
     /* Effects */
     --rm-navbar-blur: 12px;
     --rm-shadow-strong: 0 18px 40px rgba(0, 0, 0, 0.25);
+    --rm-shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.06);
 
-    /* Z-index */
+    /* Motion */
+    --rm-ease: cubic-bezier(0.2, 0.9, 0.2, 1);
+    --rm-fast: 160ms;
+    --rm-normal: 260ms;
+
+    /* Z-index (layer order: dropdown > navbar > snow...) */
     --rm-z-navbar: 1050;
     --rm-z-dropdown: 1100;
     --rm-z-snow: 1040;
@@ -33,26 +62,71 @@
     --rm-radius-pill: 10px;
 }
 
-/* ========== BASE ========== */
+/* =========================================================
+   2) BASE (Thiết lập nền tảng)
+   - smooth scroll
+   - font hệ thống (ưu tiên Inter nếu có)
+   - img default an toàn: không ép tỉ lệ toàn site
+   - hỗ trợ prefers-reduced-motion (tắt animation khi cần)
+   ========================================================= */
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
+    background: #fff;
 }
 
-/* ========== BUTTONS ========== */
+/* safer default for images (DON'T force aspect ratio globally) */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
 
-/* (Tuỳ chọn) đồng bộ style cơ bản cho mọi button */
+/* accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* =========================================================
+   3) BUTTONS (Override Bootstrap button)
+   - Bo góc đồng bộ
+   - Transition mượt
+   - Press effect khi click
+   - Focus ring rõ cho người dùng keyboard
+   ========================================================= */
 .btn {
     border-radius: var(--rm-radius-pill);
     font-weight: 600;
     letter-spacing: 0.2px;
+    transition: transform var(--rm-fast) var(--rm-ease),
+        box-shadow var(--rm-fast) var(--rm-ease),
+        filter var(--rm-fast) var(--rm-ease);
+}
+
+.btn:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.btn:disabled,
+.btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
 }
 
 /* Focus ring theo brand (đè focus của Bootstrap) */
 .btn:focus,
 .btn:focus-visible {
     outline: 0;
-    /* fallback (ổn định) */
     box-shadow: 0 0 0 0.25rem rgba(153, 194, 255, 0.45);
 }
 
@@ -103,7 +177,7 @@ body {
 }
 
 /* =========================
-   ACCENT (map warning -> accent)
+   ACCENT (warning -> accent)
    ========================= */
 .btn-warning {
     --bs-btn-color: #111;
@@ -140,7 +214,7 @@ body {
 }
 
 /* =========================
-   SECONDARY / LIGHT / LINK (nhẹ nhàng theo neutral)
+   SECONDARY / LIGHT / LINK
    ========================= */
 .btn-secondary {
     --bs-btn-color: var(--rm-white);
@@ -161,23 +235,13 @@ body {
     color: var(--rm-primary-hover);
 }
 
-/* Disabled chung */
-.btn:disabled,
-.btn.disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
-}
-
 /* =========================
    OUTLINE SECONDARY (Brand-soft, không xám)
    ========================= */
 .btn-outline-secondary {
-    /* mặc định: chữ xanh brand, viền xanh nhạt, nền trắng */
     --bs-btn-color: var(--rm-primary);
     --bs-btn-bg: var(--rm-white);
-
-    /* nếu trình duyệt hỗ trợ color-mix thì viền sẽ “nhẹ” hơn primary */
-    --bs-btn-border-color: color-mix(in srgb, var(--rm-primary) 55%, white);
+    --bs-btn-border-color: rgba(var(--rm-primary-rgb), 0.55);
 
     --bs-btn-hover-color: var(--rm-white);
     --bs-btn-hover-bg: var(--rm-primary);
@@ -189,30 +253,190 @@ body {
 
     --bs-btn-disabled-color: var(--rm-primary);
     --bs-btn-disabled-bg: var(--rm-white);
-    --bs-btn-disabled-border-color: color-mix(
-        in srgb,
-        var(--rm-primary) 35%,
-        white
+    --bs-btn-disabled-border-color: rgba(var(--rm-primary-rgb), 0.35);
+}
+
+/* =========================
+   Ripple (apply only to main buttons)
+   ========================= */
+.btn-primary,
+.btn-outline-primary,
+.btn-outline-secondary {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::after,
+.btn-outline-primary::after,
+.btn-outline-secondary::after {
+    content: "";
+    position: absolute;
+    inset: -40%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.35) 0%,
+        rgba(255, 255, 255, 0) 60%
     );
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 520ms var(--rm-ease), opacity 520ms var(--rm-ease);
+    pointer-events: none;
 }
 
-/* Fallback cho browser không hỗ trợ color-mix */
-@supports not (color: color-mix(in srgb, black, white)) {
-    .btn-outline-secondary {
-        --bs-btn-border-color: var(--rm-primary);
-        --bs-btn-disabled-border-color: var(--rm-primary);
-    }
+.btn-primary:active::after,
+.btn-outline-primary:active::after,
+.btn-outline-secondary:active::after {
+    transform: scale(1);
+    opacity: 1;
 }
 
-img {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    height: auto;
-    object-fit: cover;
-    display: block;
+.btn-primary:hover {
+    box-shadow: 0 10px 22px rgba(var(--rm-primary-rgb), 0.2);
+    filter: brightness(1.02);
 }
 
-/* ========== Footer (Roomia) ========== */
+/* =========================================================
+   4) FORMS (Focus hiện đại)
+   - Tăng trải nghiệm nhập liệu (focus ring mềm)
+   - Border đổi theo brand
+   ========================================================= */
+.form-control,
+.form-select {
+    border-color: rgba(0, 0, 0, 0.14);
+    transition: box-shadow var(--rm-fast) var(--rm-ease),
+        border-color var(--rm-fast) var(--rm-ease),
+        transform var(--rm-fast) var(--rm-ease);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: rgba(var(--rm-primary-rgb), 0.55);
+    box-shadow: 0 0 0 0.2rem rgba(var(--rm-primary-rgb), 0.14);
+}
+
+.form-control:focus {
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   5) NAVBAR (Z-index & dropdown)
+   - Đảm bảo dropdown không bị che bởi phần tử khác
+   ========================================================= */
+.navbar {
+    position: relative;
+    z-index: var(--rm-z-navbar);
+}
+.navbar .dropdown-menu {
+    z-index: var(--rm-z-dropdown);
+}
+
+/* =========================================================
+   6) APP NAVBAR (dùng chung Guest/Host/Admin)
+   - Gradient brand
+   - Active underline accent
+   - Brand icon nhỏ
+   ========================================================= */
+.app-navbar {
+    background: linear-gradient(
+        90deg,
+        var(--rm-primary),
+        var(--rm-primary-hover)
+    );
+    backdrop-filter: blur(var(--rm-navbar-blur));
+}
+
+.brand-icon {
+    width: var(--rm-brand-icon-size);
+    height: var(--rm-brand-icon-size);
+    border-radius: var(--rm-radius-pill);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+}
+
+.text-accent,
+.rm-text-accent {
+    color: var(--rm-accent);
+}
+.rm-text-primary {
+    color: var(--rm-primary);
+}
+
+.app-navbar .navbar-nav .nav-item {
+    margin-right: 1rem;
+}
+.app-navbar .navbar-nav .nav-item:last-child {
+    margin-right: 0;
+}
+
+.app-navbar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    opacity: 0.9;
+}
+
+.app-navbar .nav-link.active {
+    font-weight: 600;
+    opacity: 1;
+    position: relative;
+}
+
+.app-navbar .nav-link.active::after {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    right: 0.5rem;
+    bottom: 0;
+    height: 2px;
+    border-radius: 99px;
+    background: var(--rm-accent);
+}
+
+/* =========================================================
+   7) CARD EFFECTS (rm-card)
+   - Card nổi nhẹ khi hover (lift)
+   - Shadow mềm, phù hợp giao diện booking/travel
+   - rm-card-soft: biến thể nhẹ hơn
+   ========================================================= */
+.rm-card,
+.rm-card-soft {
+    border-radius: 16px;
+}
+
+.rm-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: var(--rm-shadow-soft);
+    transition: transform var(--rm-normal) var(--rm-ease),
+        box-shadow var(--rm-normal) var(--rm-ease),
+        border-color var(--rm-normal) var(--rm-ease);
+}
+
+.rm-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
+    border-color: rgba(var(--rm-primary-rgb), 0.22);
+}
+
+.rm-card-soft {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: var(--rm-shadow-soft);
+    border-radius: 16px;
+}
+
+/* simple reveal
+   - Gắn class rm-animate vào block để hiện mượt khi load trang */
+.rm-animate {
+    animation: rm-fade-up 520ms ease both;
+}
+
+/* =========================================================
+   8) FOOTER
+   - Link hover theo brand
+   - Divider nhẹ
+   ========================================================= */
 .rm-footer {
     background: #f3f5f7;
     border-top: 1px solid rgba(0, 0, 0, 0.08);
@@ -252,73 +476,11 @@ img {
     text-decoration: underline;
 }
 
-/* ========== NAVBAR (GLOBAL) ========== */
-.navbar {
-    position: relative;
-    z-index: var(--rm-z-navbar);
-}
-
-.navbar .dropdown-menu {
-    z-index: var(--rm-z-dropdown);
-}
-
-/* ========== APP NAVBAR (SHARED FOR ALL ROLES) ========== */
-.app-navbar {
-    background: linear-gradient(
-        90deg,
-        var(--rm-primary),
-        var(--rm-primary-hover)
-    );
-    backdrop-filter: blur(var(--rm-navbar-blur));
-}
-
-.brand-icon {
-    width: var(--rm-brand-icon-size);
-    height: var(--rm-brand-icon-size);
-    border-radius: var(--rm-radius-pill);
-    background: rgba(255, 255, 255, 0.1);
-    font-size: 0.9rem;
-}
-
-.text-accent {
-    color: var(--rm-accent);
-}
-
-.app-navbar .navbar-nav .nav-item {
-    margin-right: 1rem;
-}
-.app-navbar .navbar-nav .nav-item:last-child {
-    margin-right: 0;
-}
-
-.app-navbar .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
-    opacity: 0.9;
-}
-
-.app-navbar .nav-link.active {
-    font-weight: 600;
-    opacity: 1;
-    position: relative;
-}
-
-.app-navbar .nav-link.active::after {
-    content: "";
-    position: absolute;
-    left: 0.5rem;
-    right: 0.5rem;
-    bottom: 0;
-    height: 2px;
-    border-radius: 99px;
-    background: var(--rm-accent);
-}
-
-/* ========== AUTH SLIDER ========== */
+/* =========================================================
+   9) AUTH SLIDER (Login/Register)
+   - Nền gradient động (gradientShift)
+   - Layout 2 panel trượt qua lại bằng class auth-mode-signup
+   ========================================================= */
 .auth-page {
     background: linear-gradient(
         135deg,
@@ -377,12 +539,18 @@ img {
     color: var(--rm-primary-hover);
 }
 
-/* ========== ROOM / IMAGE ========== */
+/* =========================================================
+   10) ROOM / IMAGE
+   - Khung map (Google Map)
+   - Thumbnail ratio 16:9
+   - Modal image giới hạn chiều cao
+   ========================================================= */
 .rm-map-canvas {
     width: 100%;
     height: 320px;
     border-radius: 12px;
     background: var(--rm-surface);
+    overflow: hidden;
 }
 
 .room-thumb-wrapper {
@@ -433,12 +601,6 @@ img {
     line-height: 1.65;
 }
 
-.rm-card-soft {
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-    border-radius: 16px;
-}
-
 .rm-section-head {
     display: flex;
     flex-direction: column;
@@ -458,23 +620,17 @@ img {
     padding: 0.28rem 0.65rem;
     border-radius: var(--rm-radius-pill);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(0, 59, 149, 0.06);
+    background: rgba(var(--rm-primary-rgb), 0.06);
     color: var(--rm-primary);
     font-size: 0.85rem;
     white-space: nowrap;
-}
-
-.rm-text-primary {
-    color: var(--rm-primary);
-}
-.rm-text-accent {
-    color: var(--rm-accent);
 }
 
 .rm-select {
     border-radius: 12px;
     border-color: rgba(0, 0, 0, 0.1);
 }
+
 .rm-amenity {
     display: flex;
     align-items: center;
@@ -503,29 +659,28 @@ img {
 .rm-map-h320 {
     height: 320px;
 }
+
+/* Room card cover hover zoom */
 .rm-room-card {
     overflow: hidden;
 }
-
 .rm-room-cover {
     display: block;
     position: relative;
     text-decoration: none;
 }
-
 .rm-cover-frame {
     background: var(--rm-surface);
 }
-
 .rm-cover-img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     transition: transform 0.25s ease;
 }
-
 .rm-room-cover:hover .rm-cover-img {
     transform: scale(1.03);
 }
-
 .rm-cover-empty {
     display: flex;
     align-items: center;
@@ -545,6 +700,7 @@ img {
     gap: 8px;
     z-index: 2;
 }
+
 .rm-badge {
     display: inline-flex;
     align-items: center;
@@ -570,11 +726,11 @@ img {
     color: #111;
     text-decoration: none;
 }
-
 .rm-room-title:hover {
     color: var(--rm-primary);
     text-decoration: underline;
 }
+
 /* Sticky sidebar (desktop) */
 @media (min-width: 992px) {
     .rm-sticky {
@@ -583,8 +739,11 @@ img {
     }
 }
 
-/* ====== destinations card =========== */
-/* ===== Popular Destinations ===== */
+/* =========================================================
+   11) POPULAR DESTINATIONS (Home)
+   - Card overlay gradient + hover zoom
+   - Shine effect (pseudo-element before)
+   ========================================================= */
 .dest-link {
     color: inherit;
     text-decoration: none;
@@ -606,6 +765,8 @@ img {
 }
 
 .dest-img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     transform: scale(1);
     transition: transform 0.55s ease;
@@ -615,7 +776,6 @@ img {
     transform: scale(1.08);
 }
 
-/* Overlay gradient */
 .dest-card::after {
     content: "";
     position: absolute;
@@ -634,7 +794,6 @@ img {
     opacity: 0.75;
 }
 
-/* Shine effect */
 .dest-card::before {
     content: "";
     position: absolute;
@@ -653,7 +812,7 @@ img {
 }
 
 .dest-overlay {
-    pointer-events: none; /* click vẫn đi theo <a> bọc ngoài */
+    pointer-events: none;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -690,16 +849,18 @@ img {
     transform: translateX(0);
 }
 
-/* ========== ABOUT / CONTENT PAGES (ROOMIA) ========== */
-
-/* nền trang about có “blob” chuyển động nhẹ */
+/* =========================================================
+   12) ABOUT / CONTENT PAGES
+   - Background blob + shimmer tạo cảm giác “hiện đại”
+   - Hero có overlay highlight
+   ========================================================= */
 .rm-about-bg {
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.08);
     background: radial-gradient(
             circle at 12% 8%,
-            rgba(0, 59, 149, 0.14),
+            rgba(var(--rm-primary-rgb), 0.14),
             transparent 55%
         ),
         linear-gradient(
@@ -710,7 +871,6 @@ img {
     box-shadow: 0 16px 34px rgba(0, 0, 0, 0.08);
 }
 
-/* 2 lớp blob màu (chạy rất nhẹ để không rối mắt) */
 .rm-about-bg::before,
 .rm-about-bg::after {
     content: "";
@@ -725,19 +885,18 @@ img {
 .rm-about-bg::before {
     left: -180px;
     top: -220px;
+    width: 520px;
+    height: 520px;
     background: radial-gradient(
         circle at 30% 30%,
-        rgba(0, 59, 149, 0.35),
+        rgba(var(--rm-primary-rgb), 0.35),
         transparent 60%
     );
     animation: rm-blob-a 18s ease-in-out infinite;
 }
 
 .rm-about-bg::after {
-    content: "";
-    position: absolute;
     inset: -2px;
-    pointer-events: none;
     opacity: 0.25;
     background-image: radial-gradient(
             circle at 18% 22%,
@@ -754,16 +913,14 @@ img {
             rgba(255, 255, 255, 0.45),
             transparent 36%
         );
-    animation: rm-about-shimmer 12s ease-in-out infinite;
+    animation: rm-shimmer 12s ease-in-out infinite;
 }
 
-/* đảm bảo content nằm trên blob */
 .rm-about-bg > * {
     position: relative;
     z-index: 1;
 }
 
-/* hero: gradient + pattern nhẹ + shadow */
 .rm-page-hero {
     position: relative;
     overflow: hidden;
@@ -771,7 +928,7 @@ img {
     border: 1px solid rgba(0, 0, 0, 0.08);
     background: linear-gradient(
         135deg,
-        rgba(0, 59, 149, 0.12),
+        rgba(var(--rm-primary-rgb), 0.12),
         rgba(255, 255, 255, 0.92)
     );
     box-shadow: 0 18px 36px rgba(0, 0, 0, 0.1);
@@ -802,52 +959,39 @@ img {
     animation: rm-shimmer 10s ease-in-out infinite;
 }
 
-/* badge mềm + hover “lift” */
+/* badge mềm */
 .rm-soft-badge {
     background: linear-gradient(
         135deg,
-        rgba(0, 59, 149, 0.1),
+        rgba(var(--rm-primary-rgb), 0.1),
         rgba(255, 255, 255, 0.85)
     );
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 999px;
     padding: 0.38rem 0.7rem;
-    transition: transform 0.16s ease, box-shadow 0.16s ease,
-        border-color 0.16s ease;
+    transition: transform var(--rm-fast) var(--rm-ease),
+        box-shadow var(--rm-fast) var(--rm-ease),
+        border-color var(--rm-fast) var(--rm-ease);
     animation: rm-fade-up 520ms ease both;
 }
 
 .rm-soft-badge:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 59, 149, 0.22);
+    border-color: rgba(var(--rm-primary-rgb), 0.22);
 }
 
-/* icon pill “glow” nhẹ */
+/* icon pill */
 .rm-icon-pill {
-    background: rgba(0, 59, 149, 0.1);
+    background: rgba(var(--rm-primary-rgb), 0.1);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 999px;
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    transition: transform var(--rm-fast) var(--rm-ease),
+        box-shadow var(--rm-fast) var(--rm-ease);
 }
 
 .rm-icon-pill i {
-    transition: transform 0.18s ease;
-}
-
-/* card: hover nổi + icon có chuyển động nhẹ */
-.rm-card {
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 18px;
-    transition: transform 0.16s ease, box-shadow 0.16s ease,
-        border-color 0.16s ease;
-    animation: rm-fade-up 520ms ease both;
-}
-
-.rm-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.12);
-    border-color: rgba(0, 59, 149, 0.22);
+    transition: transform var(--rm-fast) var(--rm-ease);
 }
 
 .rm-card:hover .rm-icon-pill {
@@ -859,87 +1003,60 @@ img {
     transform: rotate(-8deg) scale(1.06);
 }
 
-/* =========================
-   ROOMIA SLIDER (SAFE CSS)
-   - Không ẩn item mặc định (tránh mất view)
-   - JS chạy thì đẹp hơn, JS không chạy vẫn OK
-   ========================= */
-
-/* Ảnh cover 1:1 */
+/* =========================================================
+   13) ROOMIA SLIDER (Scrollable track)
+   - Dùng scroll-snap để kéo ngang mượt
+   - Nút prev/next xuất hiện khi hover slider
+   - Progress bar thể hiện mức kéo
+   ========================================================= */
 .roomia-img-cover {
     object-fit: cover;
 }
 
-/* Wrapper slider */
 .roomia-slider {
     position: relative;
 }
 
-/* Track cuộn ngang */
 .roomia-slider__track {
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-
-    /* chừa khoảng cho nút prev/next + progress */
     padding: 0.25rem 2.5rem 0.75rem;
+    cursor: grab;
+    scrollbar-width: none;
 }
-
-/* Ẩn scrollbar để đỡ “kì” */
 .roomia-slider__track::-webkit-scrollbar {
     height: 0;
 }
-.roomia-slider__track {
-    scrollbar-width: none;
-}
 
-/* Cảm giác kéo */
-.roomia-slider__track {
-    cursor: grab;
-}
 .roomia-slider__track.is-dragging {
     cursor: grabbing;
     user-select: none;
 }
 
-/* Item snap */
 .roomia-slider__item {
     scroll-snap-align: start;
 }
 
-/* Card: animation/transition mượt */
 .roomia-slider__item .card {
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     overflow: hidden;
-
-    /* Mặc định (JS không chạy vẫn đẹp) */
-    transform: translateY(0) scale(1);
     transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
     will-change: transform;
-}
 
-/* Hover: “đặc biệt” hơn */
-.roomia-slider__item .card:hover {
-    transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
-}
-
-/* Active (JS sẽ gán class is-active) */
-.roomia-slider__item.is-active .card {
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
-}
-
-/* Nếu JS set biến coverflow thì card sẽ “3D” nhẹ */
-.roomia-slider__item .card {
     transform: perspective(900px) translateY(var(--roomia-y, 0px))
         rotateY(var(--roomia-ry, 0deg)) scale(var(--roomia-s, 1));
     filter: saturate(var(--roomia-sat, 1)) brightness(var(--roomia-bri, 1));
 }
 
-/* Nút điều hướng */
+.roomia-slider__item .card:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+}
+
 .roomia-slider__btn {
     position: absolute;
     top: 45%;
@@ -981,7 +1098,6 @@ img {
     right: 0.35rem;
 }
 
-/* Progress */
 .roomia-slider__progress {
     height: 4px;
     background: rgba(0, 0, 0, 0.08);
@@ -998,12 +1114,10 @@ img {
     transition: width 0.15s ease;
 }
 
-/* Reveal animation: an toàn (không set opacity:0 mặc định) */
 .roomia-reveal {
     opacity: 1;
     transform: none;
 }
-
 .roomia-reveal.is-visible {
     animation: roomiaFadeUp 0.45s ease both;
 }
@@ -1019,7 +1133,6 @@ img {
     }
 }
 
-/* Responsive: màn nhỏ thì bớt padding để fit */
 @media (max-width: 575.98px) {
     .roomia-slider__track {
         padding-left: 1.75rem;
@@ -1030,10 +1143,15 @@ img {
         margin-right: 1.75rem;
     }
 }
-/* Why Roomia */
+
+/* =========================================================
+   14) WHY ROOMIA (Home)
+   - Section nền primary
+   - Card hover nhẹ + top border accent
+   ========================================================= */
 .why-roomia {
     background: var(--rm-primary);
-    border: 1px solid rgba(var(--rm-primary), 0.08);
+    border: 1px solid rgba(var(--rm-primary-rgb), 0.18);
     border-radius: 1.25rem;
     padding: 1.25rem;
 }
@@ -1047,7 +1165,7 @@ img {
     width: 42px;
     height: 10px;
     border-radius: 999px;
-    background: rgba(var(--rm-accent), 0.18);
+    background: rgba(var(--rm-accent-rgb), 0.18);
 }
 
 .why-roomia__card {
@@ -1063,7 +1181,7 @@ img {
     top: 0;
     width: 100%;
     height: 3px;
-    background: rgba(var(--rm-accent), 0.35);
+    background: rgba(var(--rm-accent-rgb), 0.35);
 }
 
 .why-roomia__card:hover {
@@ -1090,7 +1208,7 @@ img {
 }
 
 .why-roomia__desc {
-    color: var(--bs-body-color-rgb);
+    color: rgba(var(--bs-body-color-rgb), 0.92);
     font-size: 0.92rem;
     line-height: 1.45;
 }
@@ -1098,10 +1216,14 @@ img {
 .why-roomia__line {
     height: 1px;
     width: 100%;
-    background: rgba(var(--rm-accent), 0.08);
+    background: rgba(var(--rm-accent-rgb), 0.08);
 }
 
-/* ===== Explore Vietnam Banner ===== */
+/* =========================================================
+   15) EXPLORE BANNER (Home)
+   - Background blur + veil gradient để chữ nổi
+   - Poster hover zoom + CTA hiện khi hover
+   ========================================================= */
 .explore {
     position: relative;
     border-radius: 22px;
@@ -1158,7 +1280,6 @@ img {
     }
 }
 
-/* LEFT panel */
 .explore__panel {
     border-radius: 18px;
     padding: 16px;
@@ -1278,7 +1399,6 @@ img {
     color: rgba(255, 255, 255, 0.86);
 }
 
-/* RIGHT poster */
 .explore__poster {
     display: block;
     position: relative;
@@ -1387,12 +1507,10 @@ img {
     transform: translateY(0);
 }
 
-/* fade while switching */
 .explore__poster.is-fading .explore__img {
     opacity: 0.35;
 }
 
-/* dots */
 .explore__dots {
     display: flex;
     justify-content: center;
@@ -1412,15 +1530,6 @@ img {
     border-color: rgba(255, 193, 7, 0.55);
 }
 
-/* Reduce motion */
-@media (prefers-reduced-motion: reduce) {
-    .explore__poster,
-    .explore__img,
-    .explore__chip,
-    .explore__cta {
-        transition: none;
-    }
-}
 .explore__videoCard {
     padding: 14px;
     border-radius: 20px;
@@ -1430,39 +1539,30 @@ img {
     -webkit-backdrop-filter: blur(var(--rm-navbar-blur));
 }
 
-/* =========================
-   Recent searches slider (Roomia)
-   ========================= */
-
+/* =========================================================
+   16) RECENT SEARCHES SLIDER
+   - Card có viền accent, icon có dot
+   - Fading edges trái/phải cho cảm giác “carousel”
+   ========================================================= */
 .rs-wrap {
     position: relative;
 }
 
-/* Track slider */
 .rs-track {
     overflow-x: auto;
     padding-bottom: 6px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 }
+.rs-track::-webkit-scrollbar {
+    height: 0;
+}
+
 .rs-slide {
     scroll-snap-align: start;
 }
 
-/* Scrollbar (solid) */
-.rs-track::-webkit-scrollbar {
-    height: 0;
-}
-.rs-track::-webkit-scrollbar-thumb {
-    background: var(--rm-gray-600);
-    border-radius: var(--rm-radius-pill);
-}
-.rs-track::-webkit-scrollbar-track {
-    background: var(--rm-surface);
-    border-radius: var(--rm-radius-pill);
-}
-
-/* Card: viền primary nhẹ + stripe accent (solid) */
 .rs-card {
     position: relative;
     overflow: hidden;
@@ -1472,7 +1572,6 @@ img {
     transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 
-/* Viền primary “nhẹ” bằng pseudo + opacity (không cần color-mix) */
 .rs-card::after {
     content: "";
     position: absolute;
@@ -1483,7 +1582,6 @@ img {
     pointer-events: none;
 }
 
-/* Stripe accent ở cạnh trái cho nổi bật */
 .rs-card::before {
     content: "";
     position: absolute;
@@ -1496,7 +1594,6 @@ img {
     pointer-events: none;
 }
 
-/* Hover: nổi hơn, viền rõ hơn */
 .rs-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--rm-shadow-strong);
@@ -1505,7 +1602,6 @@ img {
     opacity: 0.22;
 }
 
-/* Icon: nền tint primary (solid + opacity) */
 .rs-icon {
     position: relative;
     width: 44px;
@@ -1524,13 +1620,11 @@ img {
     opacity: 0.08;
     pointer-events: none;
 }
-/* icon nằm trên lớp nền */
 .rs-icon > i {
     position: relative;
     z-index: 1;
 }
 
-/* Chấm accent nhỏ để “đặc biệt” hơn (không gradient) */
 .rs-icon::after {
     content: "";
     position: absolute;
@@ -1540,11 +1634,10 @@ img {
     height: 7px;
     border-radius: var(--rm-radius-pill);
     background: var(--rm-accent);
-    box-shadow: 0 0 0 2px var(--rm-white); /* tách nền */
+    box-shadow: 0 0 0 2px var(--rm-white);
     pointer-events: none;
 }
 
-/* Text */
 .rs-card .fw-semibold {
     color: var(--rm-primary);
 }
@@ -1552,7 +1645,6 @@ img {
     color: var(--rm-gray-600) !important;
 }
 
-/* Badge: viền primary nhẹ */
 .rs-card .badge {
     position: relative;
     background: var(--rm-surface) !important;
@@ -1574,7 +1666,6 @@ img {
     opacity: 0.25;
 }
 
-/* Nút điều hướng: primary + hover tint (không gradient) */
 .rs-btn {
     position: relative;
     border-radius: var(--rm-radius-pill);
@@ -1603,12 +1694,11 @@ img {
     outline-offset: 2px;
 }
 
-/* Fade 2 bên để nhìn giống slider “xịn” */
 .rs-wrap::before,
 .rs-wrap::after {
     content: "";
     position: absolute;
-    top: 40px; /* dưới header */
+    top: 40px;
     bottom: 0;
     width: 44px;
     pointer-events: none;
@@ -1631,7 +1721,12 @@ img {
     );
 }
 
-/* ========== SNOW EFFECT (GLOBAL) ========== */
+/* =========================================================
+   17) SNOW EFFECT (Christmas)
+   - CSS chỉ định nghĩa style + animation snow-fall
+   - Để có tuyết rơi: cần JS tạo nhiều <div class="snowflake">
+     và append vào #snow-container
+   ========================================================= */
 #snow-container {
     position: fixed;
     inset: 0;
@@ -1668,7 +1763,13 @@ img {
     width: 56px;
 }
 
-/* ========== ANIMATIONS ========== */
+/* =========================================================
+   18) ANIMATIONS (Keyframes)
+   - snow-fall: tuyết rơi
+   - gradientShift: nền auth chuyển màu
+   - rm-blob-a / rm-shimmer: hiệu ứng blob/shimmer cho About/Hero
+   - rm-fade-up: animation reveal nhẹ
+   ========================================================= */
 @keyframes snow-fall {
     0% {
         transform: translate3d(0, -100%, 0);
@@ -1690,7 +1791,6 @@ img {
     }
 }
 
-/* ===== animations ===== */
 @keyframes rm-blob-a {
     0%,
     100% {
@@ -1700,15 +1800,7 @@ img {
         transform: translate(40px, 55px) scale(1.06);
     }
 }
-@keyframes rm-blob-b {
-    0%,
-    100% {
-        transform: translate(0, 0) scale(1);
-    }
-    50% {
-        transform: translate(-55px, 40px) scale(1.08);
-    }
-}
+
 @keyframes rm-fade-up {
     from {
         opacity: 0;
@@ -1719,6 +1811,7 @@ img {
         transform: translateY(0);
     }
 }
+
 @keyframes rm-shimmer {
     0%,
     100% {
@@ -1731,7 +1824,11 @@ img {
     }
 }
 
-/* ========== RESPONSIVE ========== */
+/* =========================================================
+   19) RESPONSIVE
+   - Điều chỉnh padding/layout cho mobile
+   - Giảm kích thước blob để nhẹ máy
+   ========================================================= */
 @media (max-width: 768px) {
     .auth-side-panel {
         text-align: center;
@@ -1756,23 +1853,5 @@ img {
         height: 420px;
         filter: blur(36px);
         opacity: 0.48;
-    }
-}
-
-/* accessibility: giảm chuyển động nếu user bật reduce motion */
-@media (prefers-reduced-motion: reduce) {
-    .rm-about-bg::before,
-    .rm-about-bg::after,
-    .rm-page-hero,
-    .rm-page-hero::after,
-    .rm-soft-badge,
-    .rm-card {
-        animation: none;
-    }
-    .rm-soft-badge,
-    .rm-card,
-    .rm-icon-pill,
-    .rm-icon-pill i {
-        transition: none;
     }
 }
